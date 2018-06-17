@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Authors>Wikiled</Authors>
+    <Description>Utilities Shared Library</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <ProjectUrl>https://github.com/AndMu/Wikiled.Common.Utilities</ProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="4.5.6" />
+    <PackageReference Include="System.Reactive" Version="4.0.0" />
+    <PackageReference Include="Wikiled.Common" Version="1.0.11" />
+  </ItemGroup>
+  
+</Project>
