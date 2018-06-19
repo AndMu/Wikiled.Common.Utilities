@@ -48,7 +48,7 @@ namespace Wikiled.Common.Utilities.Rx
                                                     ? now.Date.Add(next)
                                                     : configuration.GetWorkDay(now.Date.AddDays(1)).Add(sortedTimes[0]);
 
-                                     logger.Debug($"Next @{date} from {sortedTimes.Aggregate("", (s, t) => s + t + ", ")}");
+                                     logger.Info($"Next @{date} from {sortedTimes.Aggregate("", (s, t) => s + t + ", ")}");
                                      return Observable.Timer(date, scheduler);
                                  })
                              .Repeat()
