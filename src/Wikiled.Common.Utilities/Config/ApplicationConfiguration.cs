@@ -22,7 +22,7 @@ namespace Wikiled.Common.Utilities.Config
                    monitorDate.DayOfWeek != DayOfWeek.Sunday;
         }
 
-        public static string GetEnvironmentVariable(string key)
+        public string GetEnvironmentVariable(string key)
         {
             var value = Environment.GetEnvironmentVariable(key);
             if (value != null)

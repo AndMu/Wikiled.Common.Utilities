@@ -9,5 +9,7 @@ namespace Wikiled.Common.Utilities.Config
         DateTime GetWorkDay(DateTime monitorDate);
 
         bool IsWorkDay(DateTime monitorDate);
+
+        string GetEnvironmentVariable(string key);
     }
 }
