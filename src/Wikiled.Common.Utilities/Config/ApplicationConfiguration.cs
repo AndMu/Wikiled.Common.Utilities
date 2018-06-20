@@ -21,5 +21,23 @@ namespace Wikiled.Common.Utilities.Config
             return monitorDate.DayOfWeek != DayOfWeek.Saturday &&
                    monitorDate.DayOfWeek != DayOfWeek.Sunday;
         }
+
+        public static string GetEnvironmentVariable(string key)
+        {
+            var value = Environment.GetEnvironmentVariable(key);
+            if (value != null)
+            {
+                return value;
+            }
+
+            value = Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Machine);
+            if (value != null)
+            {
+                return value;
+            }
+
+            return Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.User);
+        }
+
     }
 }
