@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
@@ -66,12 +67,13 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(null));
+            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(null, new NullLoggerFactory()));
+            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(mockMarketConfiguration.Object, null));
         }
 
         private ObservableTimer CreateObservableTimer()
         {
-            return new ObservableTimer(mockMarketConfiguration.Object);
+            return new ObservableTimer(mockMarketConfiguration.Object, new NullLoggerFactory());
         }
     }
 }

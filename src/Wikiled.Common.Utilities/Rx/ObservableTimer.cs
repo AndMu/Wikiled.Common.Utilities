@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Wikiled.Common.Arguments;
 using Wikiled.Common.Utilities.Config;
 
@@ -10,14 +10,19 @@ namespace Wikiled.Common.Utilities.Rx
 {
     public class ObservableTimer
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger<ObservableTimer> logger;
 
         private readonly IApplicationConfiguration configuration;
 
-        public ObservableTimer(IApplicationConfiguration configuration)
+        public ObservableTimer(IApplicationConfiguration configuration, ILoggerFactory factory)
         {
-            Guard.NotNull(() => configuration, configuration);
-            this.configuration = configuration;
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            logger = factory.CreateLogger<ObservableTimer>();
         }
 
         public IObservable<long> Daily(params TimeSpan[] times)
@@ -48,7 +53,7 @@ namespace Wikiled.Common.Utilities.Rx
                                                     ? now.Date.Add(next)
                                                     : configuration.GetWorkDay(now.Date.AddDays(1)).Add(sortedTimes[0]);
 
-                                     logger.Info($"Next @{date} from {sortedTimes.Aggregate("", (s, t) => s + t + ", ")}");
+                                     logger.LogInformation($"Next @{date} from {sortedTimes.Aggregate("", (s, t) => s + t + ", ")}");
                                      return Observable.Timer(date, scheduler);
                                  })
                              .Repeat()
