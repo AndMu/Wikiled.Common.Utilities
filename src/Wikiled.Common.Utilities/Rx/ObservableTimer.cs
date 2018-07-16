@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
-using Wikiled.Common.Arguments;
 using Wikiled.Common.Utilities.Config;
 
 namespace Wikiled.Common.Utilities.Rx
@@ -27,14 +26,25 @@ namespace Wikiled.Common.Utilities.Rx
 
         public IObservable<long> Daily(params TimeSpan[] times)
         {
-            Guard.NotNull(() => times, times);
+            if (times == null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
+
             return Daily(Scheduler.Default, times);
         }
 
         public IObservable<long> Daily(IScheduler scheduler, params TimeSpan[] times)
         {
-            Guard.NotNull(() => scheduler, scheduler);
-            Guard.NotNull(() => times, times);
+            if (scheduler == null)
+            {
+                throw new ArgumentNullException(nameof(scheduler));
+            }
+
+            if (times == null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
 
             if (times.Length == 0)
             {
