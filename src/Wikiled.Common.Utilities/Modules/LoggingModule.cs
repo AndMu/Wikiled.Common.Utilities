@@ -4,7 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Wikiled.Common.Utilities.Helpers
+namespace Wikiled.Common.Utilities.Modules
 {
     public class LoggingModule : Module
     {
