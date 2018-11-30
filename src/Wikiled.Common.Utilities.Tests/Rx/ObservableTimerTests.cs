@@ -67,13 +67,13 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(null, new NullLoggerFactory()));
-            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(mockMarketConfiguration.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(new NullLogger<ObservableTimer>(), null));
+            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(null, mockMarketConfiguration.Object));
         }
 
         private ObservableTimer CreateObservableTimer()
         {
-            return new ObservableTimer(mockMarketConfiguration.Object, new NullLoggerFactory());
+            return new ObservableTimer(new NullLogger<ObservableTimer>(), mockMarketConfiguration.Object);
         }
     }
 }
