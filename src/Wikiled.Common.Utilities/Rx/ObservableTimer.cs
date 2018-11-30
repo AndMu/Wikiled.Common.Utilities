@@ -7,21 +7,16 @@ using Wikiled.Common.Utilities.Config;
 
 namespace Wikiled.Common.Utilities.Rx
 {
-    public class ObservableTimer
+    public class ObservableTimer : IObservableTimer
     {
         private readonly ILogger<ObservableTimer> logger;
 
         private readonly IApplicationConfiguration configuration;
 
-        public ObservableTimer(IApplicationConfiguration configuration, ILoggerFactory factory)
+        public ObservableTimer(ILogger<ObservableTimer> logger, IApplicationConfiguration configuration)
         {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            logger = factory.CreateLogger<ObservableTimer>();
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IObservable<long> Daily(params TimeSpan[] times)
