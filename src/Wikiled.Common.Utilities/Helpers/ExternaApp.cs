@@ -5,7 +5,7 @@ namespace Wikiled.Common.Utilities.Helpers
 {
     public class ExternaApp
     {
-        private void OpenUrl(string url)
+        public static void OpenUrl(string url)
         {
             try
             {
