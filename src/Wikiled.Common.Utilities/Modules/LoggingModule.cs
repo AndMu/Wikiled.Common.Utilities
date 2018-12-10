@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Wikiled.Common.Logging;
 
 namespace Wikiled.Common.Utilities.Modules
 {
@@ -10,13 +11,14 @@ namespace Wikiled.Common.Utilities.Modules
     {
         private readonly IServiceCollection services = new ServiceCollection();
 
+        public LoggingModule()
+            : this(ApplicationLogging.LoggerFactory)
+        {
+        }
+
         public LoggingModule(ILoggerFactory factory)
         {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
+            ApplicationLogging.LoggerFactory = factory ?? throw new ArgumentNullException(nameof(factory));
             services.AddSingleton(factory);
             services.AddLogging(logBuilder =>
             {
