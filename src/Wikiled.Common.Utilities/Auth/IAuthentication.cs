@@ -1,9 +1,11 @@
-﻿namespace Wikiled.Common.Utilities.Auth
+﻿using System.Threading.Tasks;
+
+namespace Wikiled.Common.Utilities.Auth
 {
     public interface IAuthentication<T>
     {
-        T Authenticate();
+        Task<T> Authenticate();
 
-        T Refresh(T old);
+        Task<T> Refresh(T old);
     }
 }

@@ -4,7 +4,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Net;
+using System.Threading.Tasks;
 using Wikiled.Common.Utilities.Auth;
 
 namespace Wikiled.Common.Utilities.Tests.Auth
@@ -36,31 +36,31 @@ namespace Wikiled.Common.Utilities.Tests.Auth
         }
 
         [Test]
-        public void Authenticate()
+        public async Task Authenticate()
         {
-            mockAuthentication.Setup(item => item.Authenticate()).Returns(new TestToken { Token = "Token" });
-            var result = instance.Authenticate();
+            mockAuthentication.Setup(item => item.Authenticate()).Returns(Task.FromResult(new TestToken { Token = "Token" }));
+            var result = await instance.Authenticate().ConfigureAwait(false);
             Assert.AreEqual("Token", result.Token);
         }
 
         [Test]
-        public void AuthenticateTwice()
+        public async Task AuthenticateTwice()
         {
-            mockAuthentication.Setup(item => item.Authenticate()).Returns(new TestToken { Token = "Token" });
-            mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(new TestToken { Token = "Token2" });
-            var result = instance.Authenticate();
+            mockAuthentication.Setup(item => item.Authenticate()).Returns(Task.FromResult(new TestToken { Token = "Token" }));
+            mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(Task.FromResult(new TestToken { Token = "Token2" }));
+            var result = await instance.Authenticate().ConfigureAwait(false);
             Assert.AreEqual("Token", result.Token);
 
-            result = instance.Authenticate();
+            result = await instance.Authenticate().ConfigureAwait(false);
             Assert.AreEqual("Token2", result.Token);
         }
 
         [Test]
-        public void Refresh()
+        public async Task Refresh()
         {
-            Assert.Throws<ArgumentNullException>(() => instance.Refresh(null));
-            mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(new TestToken { Token = "Token2" });
-            var result = instance.Refresh(new TestToken());
+            Assert.ThrowsAsync<ArgumentNullException>(() => instance.Refresh(null));
+            mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(Task.FromResult(new TestToken { Token = "Token2" }));
+            var result = await instance.Refresh(new TestToken()).ConfigureAwait(false);
             Assert.AreEqual("Token2", result.Token);
         }
 

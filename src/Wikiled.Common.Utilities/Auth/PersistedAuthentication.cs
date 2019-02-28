@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Wikiled.Common.Utilities.Auth
 {
@@ -21,21 +22,21 @@ namespace Wikiled.Common.Utilities.Auth
 
         public string AuthFile { get; set; } = "key.auth";
 
-        public T Authenticate()
+        public async Task<T> Authenticate()
         {
             if (File.Exists(AuthFile))
             {
                 log.LogInformation("Found saved credentials. Loading...");
                 var json = File.ReadAllText(AuthFile);
-                return Refresh(JsonConvert.DeserializeObject<T>(json));
+                return await Refresh(JsonConvert.DeserializeObject<T>(json)).ConfigureAwait(false);
             }
 
-            T credentials = underlying.Authenticate();
+            T credentials = await underlying.Authenticate().ConfigureAwait(false);
             Save(credentials);
             return credentials;
         }
 
-        public T Refresh(T old)
+        public async Task<T> Refresh(T old)
         {
             if (old == null)
             {
@@ -43,7 +44,7 @@ namespace Wikiled.Common.Utilities.Auth
             }
 
             log.LogInformation("Refreshing credentials...");
-            T credentials = underlying.Refresh(old);
+            T credentials = await underlying.Refresh(old).ConfigureAwait(false);
             Save(credentials);
             return credentials;
         }
