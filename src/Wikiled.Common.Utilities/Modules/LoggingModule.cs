@@ -1,35 +1,33 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Wikiled.Common.Logging;
+using Wikiled.Common.Utilities.Helpers;
 
 namespace Wikiled.Common.Utilities.Modules
 {
     public class LoggingModule : Module
     {
-        private readonly ILoggerFactory factory;
-
-        private readonly ILogger<LoggingModule> logger;
+        private readonly IServiceCollection services = new ServiceCollection();
 
         public LoggingModule()
-            : this(ApplicationLogging.LoggerFactory)
+            : this(new WrappedLoggerFactory(ApplicationLogging.LoggerFactory))
         {
         }
 
         public LoggingModule(ILoggerFactory factory)
         {
-            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
-            logger = factory.CreateLogger<LoggingModule>();
+            services.AddSingleton(factory);
+            services.AddLogging(logBuilder =>
+            {
+                logBuilder.SetMinimumLevel(LogLevel.Trace);
+            });
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            var registration = builder.RegisterInstance(factory);
-            if (factory == ApplicationLogging.LoggerFactory)
-            {
-                logger.LogDebug("Using external logger - disabling dispose");
-                registration.ExternallyOwned();
-            }
+            builder.Populate(services);
         }
     }
 }
