@@ -1,7 +1,5 @@
 ﻿using System;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Wikiled.Common.Logging;
 
@@ -9,7 +7,9 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public class LoggingModule : Module
     {
-        private readonly IServiceCollection services = new ServiceCollection();
+        private readonly ILoggerFactory factory;
+
+        private readonly ILogger<LoggingModule> logger;
 
         public LoggingModule()
             : this(ApplicationLogging.LoggerFactory)
@@ -18,17 +18,18 @@ namespace Wikiled.Common.Utilities.Modules
 
         public LoggingModule(ILoggerFactory factory)
         {
-            ApplicationLogging.LoggerFactory = factory ?? throw new ArgumentNullException(nameof(factory));
-            services.AddSingleton(factory);
-            services.AddLogging(logBuilder =>
-            {
-                logBuilder.SetMinimumLevel(LogLevel.Trace);
-            });
+            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            logger = factory.CreateLogger<LoggingModule>();
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Populate(services);
+            var registration = builder.RegisterInstance(factory);
+            if (factory == ApplicationLogging.LoggerFactory)
+            {
+                logger.LogDebug("Using external logger - disabling dispose");
+                registration.ExternallyOwned();
+            }
         }
     }
 }
