@@ -12,8 +12,6 @@ namespace Wikiled.Common.Utilities.Modules
     {
         private readonly IServiceCollection services = new ServiceCollection();
 
-        private readonly ILogger<LoggingModule> logger;
-
         public LoggingModule()
             : this(new WrappedLoggerFactory(ApplicationLogging.LoggerFactory))
         {
@@ -26,7 +24,7 @@ namespace Wikiled.Common.Utilities.Modules
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            logger = factory.CreateLogger<LoggingModule>();
+            var logger = factory.CreateLogger<LoggingModule>();
             logger.LogDebug("Setting logging module");
             services.AddSingleton(factory);
             services.AddLogging(logBuilder =>
