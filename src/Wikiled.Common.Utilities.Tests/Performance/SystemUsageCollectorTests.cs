@@ -1,5 +1,3 @@
-using System;
-using Moq;
 using NUnit.Framework;
 using Wikiled.Common.Utilities.Performance;
 
