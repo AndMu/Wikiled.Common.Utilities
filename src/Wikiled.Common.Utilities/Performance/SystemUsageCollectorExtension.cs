@@ -23,7 +23,7 @@
                 }
             }
 
-            return $"Service Monitoring. Working Set: {result:F2}{type} Total CPU Used: {collector.TotalCpuUsed:F2} User CPU: {collector.UserCpuUsed:F2}";
+            return $"Service Monitoring. Working Set: {result:F2} {type} Total CPU Used: {collector.TotalCpuUsed:F2} User CPU: {collector.UserCpuUsed:F2}";
         }
     }
 }
