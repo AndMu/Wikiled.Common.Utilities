@@ -19,7 +19,7 @@ namespace Wikiled.Common.Utilities.Tests.Performance
         [Test]
         public void Collect()
         {
-            instance.CollectData();
+            instance.Refresh();
             Assert.Greater(instance.PagedMemory, 0);
             Assert.Greater(instance.NonPagedSystemMemory, 0);
             Assert.Greater(instance.PrivateMemory, 0);

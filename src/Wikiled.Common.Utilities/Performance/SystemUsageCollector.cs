@@ -34,7 +34,7 @@ namespace Wikiled.Common.Utilities.Performance
 
         public long VirtualMemoryMemory { get; private set; }
 
-        public void CollectData()
+        public void Refresh()
         {
             double totalCpuTimeUsed = process.TotalProcessorTime.TotalMilliseconds - lastTotalProcessorTime.TotalMilliseconds;
             double privilegedCpuTimeUsed = process.PrivilegedProcessorTime.TotalMilliseconds - lastPrivilegedProcessorTime.TotalMilliseconds;

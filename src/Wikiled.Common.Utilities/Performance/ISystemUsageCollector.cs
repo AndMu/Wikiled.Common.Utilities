@@ -20,6 +20,6 @@
 
         long VirtualMemoryMemory { get; }
 
-        void CollectData();
+        void Refresh();
     }
 }
