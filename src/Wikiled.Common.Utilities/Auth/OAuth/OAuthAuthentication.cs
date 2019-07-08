@@ -19,7 +19,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
         public async Task<T> Authenticate()
         {
             var auth = client.BuildAuthorizeUrl(helper.RedirectUri);
-            await helper.Start(auth, null).ConfigureAwait(false);
+            await helper.Start(auth).ConfigureAwait(false);
             var code = helper.Code;
             T token = await client.GetToken(code, helper.RedirectUri).ConfigureAwait(false);
             return token;

@@ -9,6 +9,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
     public class OAuthHelper : IOAuthHelper
     {
         private readonly ILogger<OAuthHelper> logger;
+        private string redirectUri;
 
         public OAuthHelper(ILogger<OAuthHelper> logger, int? port = null)
         {
@@ -17,7 +18,18 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
             logger.LogInformation("redirect URI: " + RedirectUri);
         }
 
-        public string RedirectUri { get; set; }
+        public string RedirectUri
+        {
+            get => redirectUri;
+            set
+            {
+                if (redirectUri != value)
+                {
+                    logger.LogInformation("Changing redirect URI: " + RedirectUri);
+                    redirectUri = value;
+                }
+            }
+        }
 
         public string Code { get; private set; }
 
