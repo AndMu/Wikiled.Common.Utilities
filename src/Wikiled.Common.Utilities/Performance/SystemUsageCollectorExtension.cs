@@ -2,7 +2,7 @@
 {
     public static class SystemUsageCollectorExtension
     {
-        public static string GetBasic(this ISystemUsageCollector collector)
+        public static string GetBasic(this ISystemUsage collector)
         {
             if (collector == null)
             {
@@ -23,7 +23,7 @@
                 }
             }
 
-            return $"Service Monitoring. Working Set: {result:F2} {type} Total CPU Used: {collector.TotalCpuUsed:F2} User CPU: {collector.UserCpuUsed:F2}";
+            return $"Working Set: {result:F2} {type} Total CPU Used: {collector.TotalCpuUsed:F2} User CPU: {collector.UserCpuUsed:F2}";
         }
     }
 }

@@ -14,7 +14,8 @@ namespace Wikiled.Common.Utilities.Modules
             builder.RegisterType<ApplicationConfiguration>().As<IApplicationConfiguration>();
             builder.RegisterType<ObservableTimer>().As<IObservableTimer>();
             builder.RegisterType<SystemUsageCollector>().As<ISystemUsageCollector>();
-            
+            builder.RegisterType<SystemUsageMonitor>().As<ISystemUsageMonitor>();
+            builder.RegisterType<SystemUsageBucket>().As<ISystemUsageBucket>();
         }
     }
 }
