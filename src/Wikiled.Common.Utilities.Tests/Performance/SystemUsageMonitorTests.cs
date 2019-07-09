@@ -43,12 +43,15 @@ namespace Wikiled.Common.Utilities.Tests.Performance
         [Test]
         public void Start()
         {
+            int times = 0;
+            instance.Refreshed += (s, a) => times++;
             instance.Start(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(2));
             scheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
             mockSystemUsageCollector.Verify(item => item.Refresh(), Times.Once);
             mockSystemUsageBucket.Verify(item => item.Add(It.IsAny<ISystemUsage>()), Times.Once());
             mockSystemUsageBucket.Verify(item => item.Recalculate(), Times.Once());
             mockSystemUsageBucket.Verify(item => item.RemoveOlder(TimeSpan.FromMinutes(2)), Times.Once());
+            Assert.AreEqual(1, times);
         }
 
         [Test]

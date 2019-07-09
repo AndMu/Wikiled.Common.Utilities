@@ -23,6 +23,8 @@ namespace Wikiled.Common.Utilities.Performance
 
         public ISystemUsageBucket UsageBucket { get; }
 
+        public event EventHandler Refreshed;
+
         public void Start(TimeSpan refresh, TimeSpan maxPeriodScan)
         {
             if (subscription != null)
@@ -65,6 +67,8 @@ namespace Wikiled.Common.Utilities.Performance
             UsageBucket.Add(usageData);
             UsageBucket.RemoveOlder(maxPeriod);
             UsageBucket.Recalculate();
+
+            Refreshed?.Invoke(this, EventArgs.Empty);
         }
     }
 }
