@@ -1,21 +1,21 @@
 ﻿using System.Reactive.Concurrency;
-using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Wikiled.Common.Utilities.Config;
 using Wikiled.Common.Utilities.Performance;
 using Wikiled.Common.Utilities.Rx;
 
 namespace Wikiled.Common.Utilities.Modules
 {
-    public class CommonModule : Module
+    public class CommonModule : IModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public void ConfigureServices(IServiceCollection service)
         {
-            builder.RegisterInstance(TaskPoolScheduler.Default).As<IScheduler>();
-            builder.RegisterType<ApplicationConfiguration>().As<IApplicationConfiguration>();
-            builder.RegisterType<ObservableTimer>().As<IObservableTimer>();
-            builder.RegisterType<SystemUsageCollector>().As<ISystemUsageCollector>();
-            builder.RegisterType<SystemUsageMonitor>().As<ISystemUsageMonitor>();
-            builder.RegisterType<SystemUsageBucket>().As<ISystemUsageBucket>();
+            service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
+            service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
+            service.AddTransient<IObservableTimer, ObservableTimer>();
+            service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
+            service.AddTransient<ISystemUsageMonitor, SystemUsageMonitor>();
+            service.AddTransient<ISystemUsageBucket, SystemUsageBucket>();
         }
     }
 }
