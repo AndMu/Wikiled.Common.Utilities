@@ -8,7 +8,7 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public class CommonModule : IModule
     {
-        public void ConfigureServices(IServiceCollection service)
+        public IServiceCollection ConfigureServices(IServiceCollection service)
         {
             service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
             service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
@@ -16,6 +16,8 @@ namespace Wikiled.Common.Utilities.Modules
             service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
             service.AddTransient<ISystemUsageMonitor, SystemUsageMonitor>();
             service.AddTransient<ISystemUsageBucket, SystemUsageBucket>();
+
+            return service;
         }
     }
 }

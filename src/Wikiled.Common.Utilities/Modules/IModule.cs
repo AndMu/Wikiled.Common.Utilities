@@ -4,6 +4,6 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public interface IModule
     {
-        void ConfigureServices(IServiceCollection services);
+        IServiceCollection ConfigureServices(IServiceCollection services);
     }
 }

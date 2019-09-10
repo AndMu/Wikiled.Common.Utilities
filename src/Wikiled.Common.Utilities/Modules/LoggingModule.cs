@@ -20,7 +20,7 @@ namespace Wikiled.Common.Utilities.Modules
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceCollection ConfigureServices(IServiceCollection services)
         {
             var logger = factory.CreateLogger<LoggingModule>();
             services.AddSingleton(factory);
@@ -30,6 +30,8 @@ namespace Wikiled.Common.Utilities.Modules
             });
 
             logger.LogDebug("Setting logging module");
+
+            return services;
         }
     }
 }
