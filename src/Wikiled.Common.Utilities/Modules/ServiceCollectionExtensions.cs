@@ -16,6 +16,18 @@ namespace Wikiled.Common.Utilities.Modules
             services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
+        public static void RegisterModule<TModule>(this IServiceCollection services)
+          where TModule : IModule, new()
+        {
+            new TModule().ConfigureServices(services);
+        }
+
+        public static void RegisterModule<TModule>(this IServiceCollection services, TModule module)
+            where TModule : IModule
+        {
+            module.ConfigureServices(services);
+        }
+
         public static IServiceCollection AddScoped<TService, TMetadata>(this IServiceCollection services, TMetadata metadata)
             where TService : class
         {
