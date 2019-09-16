@@ -8,11 +8,17 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
+        public static void AddTransientWithFactory<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService
         {
             services.AddTransient<TService, TImplementation>();
+            services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
+        }
+
+        public static void AddFactory<TService>(this IServiceCollection services)
+            where TService : class
+        {
             services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
