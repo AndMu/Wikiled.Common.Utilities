@@ -8,30 +8,45 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddTransientWithFactory<TService, TImplementation>(this IServiceCollection services)
+        public static IServiceCollection AddTransientWithFactory<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService
         {
             services.AddTransient<TService, TImplementation>();
-            services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
+            return services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
-        public static void AddFactory<TService>(this IServiceCollection services)
+        public static IServiceCollection AddFactory<TService>(this IServiceCollection services)
             where TService : class
         {
-            services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
+            return services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
-        public static void RegisterModule<TModule>(this IServiceCollection services)
+        public static IServiceCollection As<TChild, TParent>(this IServiceCollection services, Action<TChild> onActivating = null)
+            where TChild : TParent
+            where TParent : class
+        {
+            services.AddTransient<TParent>(x =>
+            {
+                var service = x.GetService<TChild>();
+                onActivating?.Invoke(service);
+
+                return service;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection RegisterModule<TModule>(this IServiceCollection services)
           where TModule : IModule, new()
         {
-            new TModule().ConfigureServices(services);
+            return new TModule().ConfigureServices(services);
         }
 
-        public static void RegisterModule<TModule>(this IServiceCollection services, TModule module)
+        public static IServiceCollection RegisterModule<TModule>(this IServiceCollection services, TModule module)
             where TModule : IModule
         {
-            module.ConfigureServices(services);
+            return module.ConfigureServices(services);
         }
 
         public static IServiceCollection AddScoped<TService, TMetadata>(this IServiceCollection services, TMetadata metadata)
