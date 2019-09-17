@@ -22,7 +22,7 @@ namespace Wikiled.Common.Utilities.Modules
             return services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
-        public static IServiceCollection As<TChild, TParent>(this IServiceCollection services, Action<TChild> onActivating = null)
+        public static IServiceCollection As<TParent, TChild>(this IServiceCollection services, Action<TChild> onActivating = null)
             where TChild : TParent
             where TParent : class
         {
