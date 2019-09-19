@@ -29,7 +29,7 @@ namespace Wikiled.Common.Utilities.Modules
             return services.AddSingleton<Func<TParent>>(x => () => (TParent)x.GetService<TChild>());
         }
 
-        public static IServiceCollection As<TParent, TChild>(this IServiceCollection services, Action<TChild> onActivating = null)
+        public static IServiceCollection AsTransient<TParent, TChild>(this IServiceCollection services, Action<TChild> onActivating = null)
             where TChild : TParent
             where TParent : class
         {
@@ -38,6 +38,35 @@ namespace Wikiled.Common.Utilities.Modules
                 var service = x.GetService<TChild>();
                 onActivating?.Invoke(service);
 
+                return service;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AsScoped<TParent, TChild>(this IServiceCollection services, Action<TChild> onActivating = null)
+            where TChild : TParent
+            where TParent : class
+        {
+            services.AddScoped<TParent>(x =>
+            {
+                var service = x.GetService<TChild>();
+                onActivating?.Invoke(service);
+
+                return service;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AsSingleton<TParent, TChild>(this IServiceCollection services, Action<TChild> onActivating = null)
+            where TChild : TParent
+            where TParent : class
+        {
+            services.AddSingleton<TParent>(x =>
+            {
+                var service = x.GetService<TChild>();
+                onActivating?.Invoke(service);
                 return service;
             });
 
