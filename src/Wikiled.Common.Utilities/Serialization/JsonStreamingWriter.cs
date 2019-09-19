@@ -1,70 +1,58 @@
-﻿using System;
+﻿using Microsoft.IO;
+using Newtonsoft.Json;
+using System;
 using System.IO;
-using System.IO.Compression;
 using System.Reactive.Disposables;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Wikiled.Common.Utilities.Serialization
 {
-    public class JsonStreamingWriter : IDisposable
+    public class JsonStreamingWriter : IJsonStreamingWriter
     {
-        private readonly StreamWriter streamWriter;
-
         private readonly JsonTextWriter writer;
 
         private int counter;
 
-        private CompositeDisposable disposable;
+        private readonly CompositeDisposable disposable;
 
-        public JsonStreamingWriter(StreamWriter streamWriter)
+        private readonly RecyclableMemoryStreamManager memoryStream;
+
+        public JsonStreamingWriter(StreamWriter streamWriter, RecyclableMemoryStreamManager memoryStream, params IDisposable[] disposables)
         {
-            this.streamWriter = streamWriter ?? throw new ArgumentNullException(nameof(streamWriter));
+            if (streamWriter == null)
+            {
+                throw new ArgumentNullException(nameof(streamWriter));
+            }
+
+            this.memoryStream = memoryStream;
             writer = new JsonTextWriter(streamWriter);
             writer.Formatting = Formatting.Indented;
             writer.WriteStartArray();
             disposable = new CompositeDisposable();
             disposable.Add(streamWriter);
             disposable.Add(writer);
-        }
 
-        public static JsonStreamingWriter CreateJson(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
+            foreach (var item in disposables)
             {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
+                disposable.Add(item);
             }
-
-            var streamWriter = new StreamWriter(path, false, Encoding.UTF8);
-            streamWriter.AutoFlush = true;
-            return new JsonStreamingWriter(streamWriter);
-        }
-
-        public static JsonStreamingWriter CreateCompressedJson(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-            }
-
-            var compressedFileStream = File.Create(path);
-            var zipStream = new GZipStream(compressedFileStream, CompressionMode.Compress);
-            var streamWriter = new StreamWriter(zipStream);
-            streamWriter.AutoFlush = true;
-            var instance = new JsonStreamingWriter(streamWriter);
-            instance.disposable.Add(zipStream);
-            instance.disposable.Add(compressedFileStream);
-            return instance;
         }
 
         public void WriteObject<T>(T instance)
         {
             counter++;
-            var json = JsonConvert.SerializeObject(instance, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore });
-            json = JToken.Parse(json).ToString(Formatting.Indented);
-            lock (writer)
+
+            using (var stream = memoryStream.GetStream())
+            using (var streamWriter = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true)) // last parameter is important
+            using (var jsonWriter = new JsonTextWriter(streamWriter))
             {
+                var serializer = new JsonSerializer();
+                serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(jsonWriter, instance);
+                streamWriter.Flush();
+                stream.Seek(0, SeekOrigin.Begin);
+                string json = Encoding.UTF8.GetString(stream.ToArray());
                 if (counter > 1)
                 {
                     writer.WriteRaw($",{Environment.NewLine}");
@@ -76,12 +64,9 @@ namespace Wikiled.Common.Utilities.Serialization
 
         public void Dispose()
         {
-            lock (writer)
-            {
-                writer.WriteEndArray();
-                writer.Close();
-                disposable?.Dispose();
-            }
+            writer.WriteEndArray();
+            writer.Close();
+            disposable?.Dispose();
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System.Reactive.Concurrency;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IO;
 using Wikiled.Common.Utilities.Config;
 using Wikiled.Common.Utilities.Performance;
 using Wikiled.Common.Utilities.Rx;
+using Wikiled.Common.Utilities.Serialization;
 
 namespace Wikiled.Common.Utilities.Modules
 {
@@ -11,12 +13,14 @@ namespace Wikiled.Common.Utilities.Modules
         public IServiceCollection ConfigureServices(IServiceCollection service)
         {
             service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
+            service.AddSingleton<RecyclableMemoryStream>();
+            service.AddSingleton<IJsonStreamingWriterFactory, JsonStreamingWriterFactory>();
+            
             service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
             service.AddTransient<IObservableTimer, ObservableTimer>();
             service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
             service.AddTransient<ISystemUsageMonitor, SystemUsageMonitor>();
             service.AddTransient<ISystemUsageBucket, SystemUsageBucket>();
-
             return service;
         }
     }

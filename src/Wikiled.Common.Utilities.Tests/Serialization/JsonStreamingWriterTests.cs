@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.IO;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Wikiled.Common.Extensions;
@@ -12,6 +13,8 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
     {
         private string path;
 
+        private readonly JsonStreamingWriterFactory factory = new JsonStreamingWriterFactory(new RecyclableMemoryStreamManager());
+
         [SetUp]
         public void Setup()
         {
@@ -23,10 +26,10 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         public void CreateJson()
         {
             path = Path.Combine(path, "data.json");
-            using (var writer = JsonStreamingWriter.CreateJson(path))
+            using (var writer = factory.CreateJson(path))
             {
-                writer.WriteObject(new DataInstance());
-                writer.WriteObject(new DataInstance());
+                writer.WriteObject(new DataInstance { Text = "One" });
+                writer.WriteObject(new DataInstance { Text = "Two" });
             }
 
             var result = JsonConvert.DeserializeObject<DataInstance[]>(File.ReadAllText(path));
@@ -38,10 +41,10 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         {
             path.EnsureDirectoryExistence();
             path = Path.Combine(path, "data.zip");
-            using (var writer = JsonStreamingWriter.CreateCompressedJson(path))
+            using (var writer = factory.CreateCompressedJson(path))
             {
-                writer.WriteObject(new DataInstance());
-                writer.WriteObject(new DataInstance());
+                writer.WriteObject(new DataInstance { Text = "One" });
+                writer.WriteObject(new DataInstance { Text = "Two" });
             }
         }
     }
