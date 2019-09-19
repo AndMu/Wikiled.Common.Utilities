@@ -12,7 +12,13 @@ namespace Wikiled.Common.Utilities.Modules
         {
             return services.AddSingleton<TService, TService, TMetadata>(metadata);
         }
-      
+
+        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory, string context)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddSingleton<TService, TImplementation, string>(implementationFactory, context);
+        }
 
         public static IServiceCollection AddSingleton<TService, TImplementation, TMetadata>(
             this IServiceCollection services,
