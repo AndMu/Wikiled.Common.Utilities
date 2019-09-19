@@ -20,6 +20,12 @@ namespace Wikiled.Common.Utilities.Modules
             return services.AddTransient<TService, TImplementation, string>(implementationFactory, context);
         }
 
+        public static IServiceCollection AddTransient<TService>(this IServiceCollection services, Func<IServiceProvider, TService> implementationFactory, string context)
+            where TService : class
+        {
+            return services.AddTransient<TService, TService, string>(implementationFactory, context);
+        }
+
         public static IServiceCollection AddTransient<TService, TImplementation, TMetadata>(
             this IServiceCollection services,
             Func<IServiceProvider, TImplementation> implementationFactory,

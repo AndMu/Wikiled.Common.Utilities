@@ -21,6 +21,11 @@ namespace Wikiled.Common.Utilities.Modules
             return services.AddScoped<TService, TImplementation, string>(implementationFactory, context);
         }
 
+        public static IServiceCollection AdAddScopeddSingleton<TService>(this IServiceCollection services, Func<IServiceProvider, TService> implementationFactory, string context)
+            where TService : class
+        {
+            return services.AddScoped<TService, TService, string>(implementationFactory, context);
+        }
 
         public static IServiceCollection AddScoped<TService, TImplementation, TMetadata>(
             this IServiceCollection services,
