@@ -13,7 +13,7 @@ namespace Wikiled.Common.Utilities.Modules
         public IServiceCollection ConfigureServices(IServiceCollection service)
         {
             service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
-            service.AddSingleton<RecyclableMemoryStream>();
+            service.AddSingleton<RecyclableMemoryStreamManager>();
             service.AddSingleton<IJsonStreamingWriterFactory, JsonStreamingWriterFactory>();
             
             service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
