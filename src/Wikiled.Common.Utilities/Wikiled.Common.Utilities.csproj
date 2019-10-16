@@ -6,6 +6,11 @@
     <Description>Utilities Shared Library</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <ProjectUrl>https://github.com/AndMu/Wikiled.Common.Utilities</ProjectUrl>
+    <IsPackable>true</IsPackable>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
