@@ -2,7 +2,7 @@
 
 namespace Wikiled.Common.Utilities.Helpers
 {
-    public static class MemoryInstances
+    public static class MemoryStreamInstances
     {
         public static RecyclableMemoryStreamManager MemoryStream { get; } = new RecyclableMemoryStreamManager();
     }

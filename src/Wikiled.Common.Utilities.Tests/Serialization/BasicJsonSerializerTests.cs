@@ -2,6 +2,8 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Wikiled.Common.Extensions;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
@@ -35,7 +37,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public void Construct()
         {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), MemoryInstances.MemoryStream);
+            ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), MemoryStreamInstances.MemoryStream);
         }
 
         [Test]
@@ -89,9 +91,23 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             }
         }
 
+        [Test]
+        public async Task SerializeDeserialize()
+        {
+            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
+            path.EnsureDirectoryExistence();
+            path = Path.Combine(path, "data.zip");
+            var dataInstance = new DataInstance();
+            dataInstance.Text = "Test";
+            await instance.SerializeJsonZip(dataInstance, path).ConfigureAwait(false);
+
+            var result = instance.DeserializeJsonZip<DataInstance>(path);
+            Assert.AreEqual(dataInstance.Text, result.Text);
+        }
+
         private BasicJsonSerializer CreateBasicJsonSerializer()
         {
-            return new BasicJsonSerializer(MemoryInstances.MemoryStream);
+            return new BasicJsonSerializer(MemoryStreamInstances.MemoryStream);
         }
     }
 }

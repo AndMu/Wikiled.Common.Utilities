@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Wikiled.Common.Utilities.Serialization
 {
-    public class JsonStreamingWriter : IJsonStreamingWriter
+    public sealed class JsonStreamingWriter : IJsonStreamingWriter
     {
         private readonly JsonTextWriter writer;
 

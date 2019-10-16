@@ -1,6 +1,6 @@
-﻿using System.Reactive.Concurrency;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IO;
+using System.Reactive.Concurrency;
 using Wikiled.Common.Utilities.Config;
 using Wikiled.Common.Utilities.Performance;
 using Wikiled.Common.Utilities.Rx;
@@ -15,7 +15,8 @@ namespace Wikiled.Common.Utilities.Modules
             service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
             service.AddSingleton<RecyclableMemoryStreamManager>();
             service.AddSingleton<IJsonStreamingWriterFactory, JsonStreamingWriterFactory>();
-            
+
+            service.AddTransient<IJsonSerializer, BasicJsonSerializer>();
             service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
             service.AddTransient<IObservableTimer, ObservableTimer>();
             service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
