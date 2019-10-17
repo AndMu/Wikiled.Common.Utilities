@@ -8,6 +8,11 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
 {
     public static class ConstructorHelper
     {
+        public static void ConstructorMustThrowArgumentNullException<T>(params object[] args)
+        {
+            ConstructorMustThrowArgumentNullException(typeof(T), args);
+        }
+
         public static void ConstructorMustThrowArgumentNullException(Type type, params object[] args)
         {
             var lookup = args.ToLookup(item => item.GetType(), item => item);
