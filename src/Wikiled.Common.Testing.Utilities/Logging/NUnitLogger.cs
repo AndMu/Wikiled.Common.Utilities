@@ -3,9 +3,7 @@ using System;
 
 namespace Wikiled.Common.Testing.Utilities.Logging
 {
-    public class NUnitLogger<T>
-        : ILogger<T>,
-          IDisposable
+    public sealed class NUnitLogger<T> : ILogger<T>, IDisposable
     {
         private readonly Action<string> output = Console.WriteLine;
 
