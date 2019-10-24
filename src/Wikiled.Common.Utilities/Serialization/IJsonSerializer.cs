@@ -1,27 +1,28 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Wikiled.Common.Utilities.Serialization
 {
     public interface IJsonSerializer
     {
-        Stream Serialize<T>(T instance);
+        Stream Serialize<T>(T instance, JsonSerializer custom = null);
 
-        byte[] SerializeArray<T>(T instance);
+        byte[] SerializeArray<T>(T instance, JsonSerializer custom = null);
 
-        T Deserialize<T>(Stream stream);
+        T Deserialize<T>(Stream stream, JsonSerializer custom = null);
 
-        T Deserialize<T>(byte[] data);
+        T Deserialize<T>(byte[] data, JsonSerializer custom = null);
 
-        T Deserialize<T>(string json);
+        T Deserialize<T>(string json, JsonSerializer custom = null);
 
         JObject Deserialize(byte[] data);
 
         JObject Deserialize(Stream stream);
 
-        T DeserializeJsonZip<T>(string fileName);
+        T DeserializeJsonZip<T>(string fileName, JsonSerializer custom = null);
 
-        Task SerializeJsonZip<T>(T instance, string fileName);
+        Task SerializeJsonZip<T>(T instance, string fileName, JsonSerializer custom = null);
     }
 }

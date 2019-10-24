@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.IO;
@@ -29,6 +30,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
 
             subscription = new DataInstance();
             subscription.Text = "Test";
+            subscription.Date = DateTime.Today;
 
             json = JsonConvert.SerializeObject(subscription);
             data = Encoding.UTF8.GetBytes(json);
@@ -38,6 +40,19 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         public void Construct()
         {
             ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), MemoryStreamInstances.MemoryStream);
+        }
+
+        [Test]
+        public void SerializeWithCustom()
+        {
+            var serializer = new JsonSerializer { DateFormatString = "yyyy-yyyy-dd-M" };
+            var result = instance.SerializeArray(subscription, serializer);
+            var text = Encoding.UTF8.GetString(result);
+            var contains = text.Contains(DateTime.Today.ToString("yyyy-yyyy-dd-M"));
+            Assert.IsTrue(contains);
+
+            var backInstance = instance.Deserialize<DataInstance>(result, serializer);
+            Assert.AreEqual(subscription.Date, backInstance.Date);
         }
 
         [Test]
