@@ -8,6 +8,8 @@ namespace Wikiled.Common.Utilities.Serialization
     {
         Stream Serialize<T>(T instance);
 
+        byte[] SerializeArray<T>(T instance);
+
         T Deserialize<T>(Stream stream);
 
         T Deserialize<T>(byte[] data);

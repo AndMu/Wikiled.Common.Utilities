@@ -74,6 +74,14 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         }
 
         [Test]
+        public void SerializeArray()
+        {
+            var data = instance.SerializeArray(subscription);
+            var result = instance.Deserialize<DataInstance>(data);
+            Assert.AreEqual("Test", result.Text);
+        }
+
+        [Test]
         public void DeserializeJObject()
         {
             var result = instance.Deserialize(data).ToObject<DataInstance>();

@@ -87,6 +87,14 @@ namespace Wikiled.Common.Utilities.Serialization
             return stream;
         }
 
+        public byte[] SerializeArray<T>(T instance)
+        {
+            using var resultStream = Serialize(instance);
+            using var outputStream = memoryStream.GetStream("Redis.Json");
+            resultStream.CopyTo(outputStream);
+            return outputStream.ToArray();
+        }
+
         public JObject Deserialize(byte[] data)
         {
             if (data == null)
