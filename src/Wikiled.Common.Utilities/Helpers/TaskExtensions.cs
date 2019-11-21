@@ -9,6 +9,5 @@ namespace Wikiled.Common.Utilities.Helpers
         {
             task.ContinueWith(t => { logger.LogError(t.Exception, "Error"); }, TaskContinuationOptions.OnlyOnFaulted);
         }
-
     }
 }
