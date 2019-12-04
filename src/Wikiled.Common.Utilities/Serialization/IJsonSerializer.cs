@@ -7,7 +7,7 @@ namespace Wikiled.Common.Utilities.Serialization
 {
     public interface IJsonSerializer
     {
-        Stream Serialize<T>(T instance, JsonSerializer custom = null);
+        MemoryStream Serialize<T>(T instance, JsonSerializer custom = null);
 
         byte[] SerializeArray<T>(T instance, JsonSerializer custom = null);
 

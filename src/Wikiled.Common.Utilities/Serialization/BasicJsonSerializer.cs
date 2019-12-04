@@ -67,7 +67,7 @@ namespace Wikiled.Common.Utilities.Serialization
             }
         }
 
-        public Stream Serialize<T>(T instance, JsonSerializer custom = null)
+        public MemoryStream Serialize<T>(T instance, JsonSerializer custom = null)
         {
             if (instance == null)
             {
