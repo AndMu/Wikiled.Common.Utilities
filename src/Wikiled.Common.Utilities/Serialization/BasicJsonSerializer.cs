@@ -59,7 +59,8 @@ namespace Wikiled.Common.Utilities.Serialization
 
             try
             {
-                return Deserialize<T>(array, custom);
+                using var stream = memoryStream.GetStream("Json", array, 0, minLength);
+                return Deserialize<T>(stream, custom);
             }
             finally
             {
