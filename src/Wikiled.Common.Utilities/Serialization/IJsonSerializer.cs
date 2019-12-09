@@ -15,6 +15,8 @@ namespace Wikiled.Common.Utilities.Serialization
 
         T Deserialize<T>(byte[] data, JsonSerializer custom = null);
 
+        T Deserialize<T>(byte[] data, int offset, int count, JsonSerializer custom = null);
+
         T Deserialize<T>(string json, JsonSerializer custom = null);
 
         JObject Deserialize(byte[] data);

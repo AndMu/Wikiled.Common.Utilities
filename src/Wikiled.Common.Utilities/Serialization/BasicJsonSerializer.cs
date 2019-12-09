@@ -44,6 +44,17 @@ namespace Wikiled.Common.Utilities.Serialization
             return Deserialize<T>(stream, custom);
         }
 
+        public T Deserialize<T>(byte[] data, int offset, int count, JsonSerializer custom = null)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            using var stream = memoryStream.GetStream("Json", data, offset, count);
+            return Deserialize<T>(stream, custom);
+        }
+
         public T Deserialize<T>(string json, JsonSerializer custom = null)
         {
             if (string.IsNullOrEmpty(json))
