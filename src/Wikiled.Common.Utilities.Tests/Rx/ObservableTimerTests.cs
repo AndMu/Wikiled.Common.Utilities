@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
+using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Config;
 using Wikiled.Common.Utilities.Rx;
 
@@ -21,8 +22,8 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         public void Setup()
         {
             mockMarketConfiguration = new Mock<IApplicationConfiguration>();
-            instance = CreateObservableTimer();
             testScheduler = new TestScheduler();
+            instance = CreateObservableTimer();
             mockMarketConfiguration.Setup(item => item.GetWorkDay(It.IsAny<DateTime>()))
                                    .Returns((DateTime item) => item);
             mockMarketConfiguration.Setup(item => item.Now).Returns(() => testScheduler.Now.UtcDateTime);
@@ -33,7 +34,7 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         {
             var results = testScheduler.CreateObserver<long>();
             var nextHour = testScheduler.Now.UtcDateTime.Hour + 1;
-            instance.Daily(testScheduler, TimeSpan.FromHours(nextHour)).Subscribe(results);
+            instance.Daily(TimeSpan.FromHours(nextHour)).Subscribe(results);
             testScheduler.AdvanceBy(TimeSpan.FromDays(3).Ticks);
             var due = TimeSpan.FromHours(1);
             results.Messages.AssertEqual(
@@ -47,7 +48,7 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         {
             var results = testScheduler.CreateObserver<long>();
             var nextHour = testScheduler.Now.UtcDateTime.Hour + 1;
-            instance.Daily(testScheduler, TimeSpan.FromHours(nextHour), TimeSpan.FromHours(nextHour + 4), TimeSpan.FromHours(nextHour + 2)).Subscribe(results);
+            instance.Daily(TimeSpan.FromHours(nextHour), TimeSpan.FromHours(nextHour + 4), TimeSpan.FromHours(nextHour + 2)).Subscribe(results);
             testScheduler.AdvanceBy(TimeSpan.FromDays(3).Ticks);
             var due1 = TimeSpan.FromHours(1);
             var due2 = TimeSpan.FromHours(3);
@@ -67,13 +68,12 @@ namespace Wikiled.Common.Utilities.Tests.Rx
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(new NullLogger<ObservableTimer>(), null));
-            Assert.Throws<ArgumentNullException>(() => new ObservableTimer(null, mockMarketConfiguration.Object));
+            ConstructorHelper.ConstructorMustThrowArgumentNullException<ObservableTimer>();
         }
 
         private ObservableTimer CreateObservableTimer()
         {
-            return new ObservableTimer(new NullLogger<ObservableTimer>(), mockMarketConfiguration.Object);
+            return new ObservableTimer(new NullLogger<ObservableTimer>(), mockMarketConfiguration.Object, testScheduler);
         }
     }
 }

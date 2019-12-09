@@ -13,23 +13,16 @@ namespace Wikiled.Common.Utilities.Rx
 
         private readonly IApplicationConfiguration configuration;
 
-        public ObservableTimer(ILogger<ObservableTimer> logger, IApplicationConfiguration configuration)
+        private readonly IScheduler scheduler;
+
+        public ObservableTimer(ILogger<ObservableTimer> logger, IApplicationConfiguration configuration, IScheduler scheduler)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IObservable<long> Daily(params TimeSpan[] times)
-        {
-            if (times == null)
-            {
-                throw new ArgumentNullException(nameof(times));
-            }
-
-            return Daily(Scheduler.Default, times);
-        }
-
-        public IObservable<long> Daily(IScheduler scheduler, params TimeSpan[] times)
         {
             if (scheduler == null)
             {
