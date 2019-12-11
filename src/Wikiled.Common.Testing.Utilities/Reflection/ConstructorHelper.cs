@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Reflection;
+using Castle.DynamicProxy.Internal;
 
 namespace Wikiled.Common.Testing.Utilities.Reflection
 {
@@ -42,6 +43,12 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     var mocksCopy = arguments.ToArray();
+
+                    if (!mocksCopy[i].GetType().IsNullableType())
+                    {
+                        continue;
+                    }
+
                     mocksCopy[i] = null;
 
                     try
