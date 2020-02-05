@@ -22,7 +22,7 @@ namespace Wikiled.Common.Utilities.Modules
             service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
             service.AddTransient<ISystemUsageMonitor, SystemUsageMonitor>();
             service.AddTransient<ISystemUsageBucket, SystemUsageBucket>();
-            service.AddSingleton(typeof(IServiceFactory<>), typeof(ContainerServiceFactory<>));
+            service.AddTransient(typeof(IServiceFactory<>), typeof(ContainerServiceFactory<>));
             return service;
         }
     }
