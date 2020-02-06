@@ -3,10 +3,9 @@ using System.Buffers;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Wikiled.Common.Utilities.Serialization
 {
@@ -14,48 +13,40 @@ namespace Wikiled.Common.Utilities.Serialization
     {
         private readonly RecyclableMemoryStreamManager memoryStream;
 
-        private readonly JsonSerializer serializer = new JsonSerializer();
-
         public BasicJsonSerializer(RecyclableMemoryStreamManager memoryStream)
         {
             this.memoryStream = memoryStream ?? throw new ArgumentNullException(nameof(memoryStream));
+            Options = new JsonSerializerOptions();
         }
 
-        public T Deserialize<T>(Stream stream, JsonSerializer custom = null)
+        public JsonSerializerOptions Options { get; }
+
+        public ValueTask<T> Deserialize<T>(Stream stream)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            using var sr = new StreamReader(stream);
-            using var jr = new JsonTextReader(sr);
-            return (custom ?? serializer).Deserialize<T>(jr);
+            return JsonSerializer.DeserializeAsync<T>(stream, Options);
         }
 
-        public T Deserialize<T>(byte[] data, JsonSerializer custom = null)
+        public T Deserialize<T>(byte[] data)
         {
             if (data == null)
             {
                 throw new ArgumentNullException(nameof(data));
             }
 
-            using var stream = memoryStream.GetStream("Json", data, 0, data.Length);
-            return Deserialize<T>(stream, custom);
+            return JsonSerializer.Deserialize<T>(data, Options);
         }
 
-        public T Deserialize<T>(byte[] data, int offset, int count, JsonSerializer custom = null)
+        public T Deserialize<T>(ArraySegment<byte> buffer)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            using var stream = memoryStream.GetStream("Json", data, offset, count);
-            return Deserialize<T>(stream, custom);
+            return JsonSerializer.Deserialize<T>(buffer, Options);
         }
 
-        public T Deserialize<T>(string json, JsonSerializer custom = null)
+        public T Deserialize<T>(string json)
         {
             if (string.IsNullOrEmpty(json))
             {
@@ -79,7 +70,17 @@ namespace Wikiled.Common.Utilities.Serialization
             }
         }
 
-        public MemoryStream Serialize<T>(T instance, JsonSerializer custom = null)
+        JsonDocument IJsonSerializer.Deserialize(byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        JsonDocument IJsonSerializer.Deserialize(Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        public MemoryStream Serialize<T>(T instance)
         {
             if (instance == null)
             {
@@ -98,7 +99,7 @@ namespace Wikiled.Common.Utilities.Serialization
             return stream;
         }
 
-        public byte[] SerializeArray<T>(T instance, JsonSerializer custom = null)
+        public byte[] SerializeArray<T>(T instance)
         {
             using var resultStream = Serialize(instance, custom);
             using var outputStream = memoryStream.GetStream("Redis.Json");
@@ -130,7 +131,7 @@ namespace Wikiled.Common.Utilities.Serialization
             return (JObject) JToken.ReadFrom(jsonTextReader);
         }
 
-        public T DeserializeJsonZip<T>(string fileName, JsonSerializer custom = null)
+        public T DeserializeJsonZip<T>(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -144,7 +145,7 @@ namespace Wikiled.Common.Utilities.Serialization
             }
         }
 
-        public async Task SerializeJsonZip<T>(T instance, string fileName, JsonSerializer custom = null)
+        public async Task SerializeJsonZip<T>(T instance, string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
