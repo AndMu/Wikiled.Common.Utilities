@@ -1,11 +1,9 @@
-﻿using System;
-using System.Buffers;
+﻿using Microsoft.IO;
+using System;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.IO;
 
 namespace Wikiled.Common.Utilities.Serialization
 {
@@ -27,7 +25,7 @@ namespace Wikiled.Common.Utilities.Serialization
             {
                 throw new ArgumentNullException(nameof(stream));
             }
-
+            
             return JsonSerializer.DeserializeAsync<T>(stream, Options);
         }
 
@@ -53,34 +51,10 @@ namespace Wikiled.Common.Utilities.Serialization
                 throw new ArgumentException("Value cannot be null or empty.", nameof(json));
             }
 
-            ArrayPool<byte> pool = ArrayPool<byte>.Shared;
-            var encode = Encoding.UTF8;
-            var minLength = encode.GetByteCount(json);
-            byte[] array = pool.Rent(minLength);
-            encode.GetBytes(json, 0, json.Length, array, 0);
-
-            try
-            {
-                using var stream = memoryStream.GetStream("Json", array, 0, minLength);
-                return Deserialize<T>(stream, custom);
-            }
-            finally
-            {
-                pool.Return(array);
-            }
+            return JsonSerializer.Deserialize<T>(json, Options);
         }
 
-        JsonDocument IJsonSerializer.Deserialize(byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
-        JsonDocument IJsonSerializer.Deserialize(Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MemoryStream Serialize<T>(T instance)
+        public async Task<MemoryStream> Serialize<T>(T instance)
         {
             if (instance == null)
             {
@@ -88,50 +62,17 @@ namespace Wikiled.Common.Utilities.Serialization
             }
 
             var stream = memoryStream.GetStream("Json");
-
-            using var streamWriter = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true); // last parameter is important
-            using var jsonWriter = new JsonTextWriter(streamWriter);
-
-            (custom ?? serializer).Serialize(jsonWriter, instance);
-            streamWriter.Flush();
+            await JsonSerializer.SerializeAsync(stream, instance, Options).ConfigureAwait(false);
             stream.Seek(0, SeekOrigin.Begin);
-
             return stream;
         }
 
         public byte[] SerializeArray<T>(T instance)
         {
-            using var resultStream = Serialize(instance, custom);
-            using var outputStream = memoryStream.GetStream("Redis.Json");
-            resultStream.CopyTo(outputStream);
-            return outputStream.ToArray();
+            return JsonSerializer.SerializeToUtf8Bytes(instance, Options);
         }
 
-        public JObject Deserialize(byte[] data)
-        {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            using var stream = memoryStream.GetStream("Json", data, 0, data.Length);
-
-            return Deserialize(stream);
-        }
-
-        public JObject Deserialize(Stream stream)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            using var sr = new StreamReader(stream);
-            using var jsonTextReader = new JsonTextReader(sr);
-            return (JObject) JToken.ReadFrom(jsonTextReader);
-        }
-
-        public T DeserializeJsonZip<T>(string fileName)
+        public ValueTask<T> DeserializeJsonZip<T>(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -141,7 +82,7 @@ namespace Wikiled.Common.Utilities.Serialization
             using (var compressedFileStream = File.OpenRead(fileName))
             using (var zipStream = new GZipStream(compressedFileStream, CompressionMode.Decompress))
             {
-                return Deserialize<T>(zipStream, custom);
+                return Deserialize<T>(zipStream);
             }
         }
 
@@ -155,7 +96,7 @@ namespace Wikiled.Common.Utilities.Serialization
             var compressedFileStream = File.Create(fileName);
             using (var zipStream = new GZipStream(compressedFileStream, CompressionMode.Compress))
             {
-                using var stream = Serialize(instance, custom);
+                using var stream = await Serialize(instance).ConfigureAwait(false);
                 await stream.CopyToAsync(zipStream).ConfigureAwait(false);
             }
         }

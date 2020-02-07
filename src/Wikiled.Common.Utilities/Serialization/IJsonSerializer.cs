@@ -9,7 +9,7 @@ namespace Wikiled.Common.Utilities.Serialization
     {
         JsonSerializerOptions Options { get; }
 
-        MemoryStream Serialize<T>(T instance);
+        Task<MemoryStream> Serialize<T>(T instance);
 
         byte[] SerializeArray<T>(T instance);
 
@@ -21,11 +21,7 @@ namespace Wikiled.Common.Utilities.Serialization
 
         T Deserialize<T>(string json);
 
-        JsonDocument Deserialize(byte[] data);
-
-        JsonDocument Deserialize(Stream stream);
-
-        T DeserializeJsonZip<T>(string fileName);
+        ValueTask<T> DeserializeJsonZip<T>(string fileName);
 
         Task SerializeJsonZip<T>(T instance, string fileName);
     }
