@@ -17,6 +17,7 @@ namespace Wikiled.Common.Utilities.Modules
             service.AddSingleton<IJsonStreamingWriterFactory, JsonStreamingWriterFactory>();
 
             service.AddTransient<IJsonSerializer, BasicJsonSerializer>();
+            service.AddTransient<IJObjectSerialiser, JObjectSerialiser>();
             service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
             service.AddTransient<IObservableTimer, ObservableTimer>();
             service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();

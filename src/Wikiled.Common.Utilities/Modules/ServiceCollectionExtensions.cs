@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Wikiled.Common.Utilities.Modules
 {
@@ -17,6 +18,12 @@ namespace Wikiled.Common.Utilities.Modules
             where TService : class
         {
             return services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
+        }
+
+        public static IServiceCollection AddAsyncFactory<TService>(this IServiceCollection services, Func<TService, Task> init)
+            where TService : class
+        {
+            return services.AddSingleton<IAsyncServiceFactory<TService>>(x => new AsyncServiceFactory<TService>(x, init));
         }
 
         public static IServiceCollection AddFactory<TParent, TChild>(this IServiceCollection services)

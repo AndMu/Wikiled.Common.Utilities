@@ -43,25 +43,12 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         }
 
         [Test]
-        public void SerializeWithCustom()
-        {
-            var serializer = new JsonSerializer { DateFormatString = "yyyy-yyyy-dd-M" };
-            var result = instance.SerializeArray(subscription, serializer);
-            var text = Encoding.UTF8.GetString(result);
-            var contains = text.Contains(DateTime.Today.ToString("yyyy-yyyy-dd-M"));
-            Assert.IsTrue(contains);
-
-            var backInstance = instance.Deserialize<DataInstance>(result, serializer);
-            Assert.AreEqual(subscription.Date, backInstance.Date);
-        }
-
-        [Test]
-        public void Deserialize()
+        public async Task Deserialize()
         {
             using (Stream stream = new MemoryStream(data))
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                var result = instance.Deserialize<DataInstance>(stream);
+                var result = await instance.Deserialize<DataInstance>(stream);
                 Assert.AreEqual("Test", result.Text);
             }
         }
@@ -81,10 +68,10 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         }
 
         [Test]
-        public void Serialize()
+        public async Task Serialize()
         {
-            var stream = instance.Serialize(subscription);
-            var result = instance.Deserialize<DataInstance>(stream);
+            var stream = await instance.Serialize(subscription);
+            var result = await instance.Deserialize<DataInstance>(stream);
             Assert.AreEqual("Test", result.Text);
         }
 
@@ -97,24 +84,6 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         }
 
         [Test]
-        public void DeserializeJObject()
-        {
-            var result = instance.Deserialize(data).ToObject<DataInstance>();
-            Assert.AreEqual("Test", result.Text);
-        }
-
-        [Test]
-        public void DeserializeJObjectFromBytes()
-        {
-            using (Stream stream = new MemoryStream(data))
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                var result = instance.Deserialize(stream).ToObject<DataInstance>();
-                Assert.AreEqual("Test", result.Text);
-            }
-        }
-
-        [Test]
         public async Task SerializeDeserialize()
         {
             var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
@@ -124,7 +93,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             dataInstance.Text = "Test";
             await instance.SerializeJsonZip(dataInstance, path).ConfigureAwait(false);
 
-            var result = instance.DeserializeJsonZip<DataInstance>(path);
+            var result = await instance.DeserializeJsonZip<DataInstance>(path);
             Assert.AreEqual(dataInstance.Text, result.Text);
         }
 
