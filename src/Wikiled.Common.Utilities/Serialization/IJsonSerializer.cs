@@ -17,6 +17,8 @@ namespace Wikiled.Common.Utilities.Serialization
 
         T Deserialize<T>(byte[] data);
 
+        object Deserialize(byte[] data, Type type);
+
         T Deserialize<T>(ArraySegment<byte> buffer);
 
         T Deserialize<T>(string json);

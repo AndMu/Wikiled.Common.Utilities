@@ -39,6 +39,11 @@ namespace Wikiled.Common.Utilities.Serialization
             return JsonSerializer.Deserialize<T>(data, Options);
         }
 
+        public object Deserialize(byte[] data, Type type)
+        {
+            return JsonSerializer.Deserialize(data, type, Options);
+        }
+
         public T Deserialize<T>(ArraySegment<byte> buffer)
         {
             return JsonSerializer.Deserialize<T>(buffer, Options);
