@@ -20,7 +20,7 @@ namespace Wikiled.Common.Utilities.Modules
             return services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         }
 
-        public static IServiceCollection AddAsyncFactory<TService>(this IServiceCollection services, Func<TService, Task> init)
+        public static IServiceCollection AddAsyncFactory<TService>(this IServiceCollection services, Func<IServiceProvider, TService, Task> init)
             where TService : class
         {
             return services.AddSingleton<IAsyncServiceFactory<TService>>(x => new AsyncServiceFactory<TService>(x, init));
