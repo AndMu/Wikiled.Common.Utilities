@@ -12,6 +12,8 @@ namespace Wikiled.Common.Utilities.Modules
 
         private readonly Action<ILoggingBuilder> buildAction;
 
+        private static bool configured;
+
         public LoggingModule()
             : this(new WrappedLoggerFactory(ApplicationLogging.LoggerFactory))
         {
@@ -26,6 +28,13 @@ namespace Wikiled.Common.Utilities.Modules
         public IServiceCollection ConfigureServices(IServiceCollection services)
         {
             var logger = factory.CreateLogger<LoggingModule>();
+            if (configured)
+            {
+                logger.LogWarning("Logging already configured");
+                return services;
+            }
+
+            configured = true;
             services.AddSingleton(factory);
             services.AddLogging(buildAction);
             logger.LogDebug("Setting logging module");
