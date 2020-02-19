@@ -3,6 +3,9 @@ using System;
 
 namespace Wikiled.Common.Utilities.Helpers
 {
+    /// <summary>
+    ///  Require so DI does not dispose static global one
+    /// </summary>
     public class WrappedLoggerFactory : ILoggerFactory
     {
         private readonly ILoggerFactory inner;
