@@ -24,6 +24,7 @@ namespace Wikiled.Common.Utilities.Modules
         {
             var logger = factory.CreateLogger<LoggingModule>();
             services.AddSingleton(factory);
+            services.AddLogging();
             logger.LogDebug("Setting logging module");
             return services;
         }
