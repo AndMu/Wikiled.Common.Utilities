@@ -8,18 +8,30 @@ namespace Wikiled.Common.Utilities.Modules
     {
         readonly IServiceProvider provider;
         private readonly Func<IServiceProvider, T, Task> init;
+        private readonly Func<IServiceProvider, Task<T>> construct;
 
         public AsyncServiceFactory(IServiceProvider services, Func<IServiceProvider, T, Task> init)
         {
-            this.provider = services ?? throw new ArgumentNullException(nameof(services));
+            provider = services ?? throw new ArgumentNullException(nameof(services));
             this.init = init ?? throw new ArgumentNullException(nameof(init));
+        }
+
+        public AsyncServiceFactory(IServiceProvider services, Func<IServiceProvider, Task<T>> construct)
+        {
+            provider = services ?? throw new ArgumentNullException(nameof(services));
+            this.construct = construct ?? throw new ArgumentNullException(nameof(init));
         }
 
         public async Task<T> GetService()
         {
-            var service = provider.GetRequiredService<T>();
-            await init(provider, service).ConfigureAwait(false);
-            return service;
+            if (construct == null)
+            {
+                var service = provider.GetRequiredService<T>();
+                await init(provider, service).ConfigureAwait(false);
+                return service;
+            }
+
+            return await construct(provider).ConfigureAwait(false);
         }
     }
 }
