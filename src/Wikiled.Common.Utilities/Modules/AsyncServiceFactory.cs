@@ -10,6 +10,8 @@ namespace Wikiled.Common.Utilities.Modules
         private readonly Func<IServiceProvider, T, Task> init;
         private readonly Func<IServiceProvider, Task<T>> construct;
 
+        private Lazy<Task<T>> cache;
+
         public AsyncServiceFactory(IServiceProvider services, Func<IServiceProvider, T, Task> init)
         {
             provider = services ?? throw new ArgumentNullException(nameof(services));
@@ -22,7 +24,18 @@ namespace Wikiled.Common.Utilities.Modules
             this.construct = construct ?? throw new ArgumentNullException(nameof(init));
         }
 
-        public async Task<T> GetService()
+        public Task<T> GetService(bool refresh = false)
+        {
+            if (refresh ||
+                cache == null)
+            {
+                cache = new Lazy<Task<T>>(GetServiceInternal);
+            }
+
+            return cache.Value;
+        }
+
+        private async Task<T> GetServiceInternal()
         {
             if (construct == null)
             {

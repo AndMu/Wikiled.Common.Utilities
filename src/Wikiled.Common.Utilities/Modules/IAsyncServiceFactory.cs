@@ -4,6 +4,6 @@ namespace Wikiled.Common.Utilities.Modules
 {
     public interface IAsyncServiceFactory<T>
     {
-        Task<T> GetService();
+        Task<T> GetService(bool refresh=false);
     }
 }
