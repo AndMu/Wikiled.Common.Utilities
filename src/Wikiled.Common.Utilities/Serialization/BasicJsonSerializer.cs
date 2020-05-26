@@ -84,11 +84,8 @@ namespace Wikiled.Common.Utilities.Serialization
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(fileName));
             }
 
-            using (var compressedFileStream = File.OpenRead(fileName))
-            using (var zipStream = new GZipStream(compressedFileStream, CompressionMode.Decompress))
-            {
-                return Deserialize<T>(zipStream);
-            }
+            using var zipStream = new GZipStream(File.OpenRead(fileName), CompressionMode.Decompress);
+            return Deserialize<T>(zipStream);
         }
 
         public async Task SerializeJsonZip<T>(T instance, string fileName)
@@ -99,11 +96,9 @@ namespace Wikiled.Common.Utilities.Serialization
             }
 
             var compressedFileStream = File.Create(fileName);
-            using (var zipStream = new GZipStream(compressedFileStream, CompressionMode.Compress))
-            {
-                using var stream = await Serialize(instance).ConfigureAwait(false);
-                await stream.CopyToAsync(zipStream).ConfigureAwait(false);
-            }
+            using var zipStream = new GZipStream(compressedFileStream, CompressionMode.Compress);
+            using var stream = await Serialize(instance).ConfigureAwait(false);
+            await stream.CopyToAsync(zipStream).ConfigureAwait(false);
         }
     }
 }
