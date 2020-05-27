@@ -77,7 +77,7 @@ namespace Wikiled.Common.Utilities.Serialization
             return JsonSerializer.SerializeToUtf8Bytes(instance, Options);
         }
 
-        public ValueTask<T> DeserializeJsonZip<T>(string fileName)
+        public async ValueTask<T> DeserializeJsonZip<T>(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -85,7 +85,8 @@ namespace Wikiled.Common.Utilities.Serialization
             }
 
             using var zipStream = new GZipStream(File.OpenRead(fileName), CompressionMode.Decompress);
-            return Deserialize<T>(zipStream);
+            var result = await Deserialize<T>(zipStream);
+            return result;
         }
 
         public async Task SerializeJsonZip<T>(T instance, string fileName)
