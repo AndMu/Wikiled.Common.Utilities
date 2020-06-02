@@ -8,18 +8,13 @@ using System.Threading.Tasks;
 
 namespace Wikiled.Common.Utilities.Resources
 {
-    public class DataDownloader
+    public class DataDownloader : IDataDownloader
     {
-        private readonly ILogger log;
+        private readonly ILogger<DataDownloader> log;
 
-        public DataDownloader(ILoggerFactory logger)
+        public DataDownloader(ILogger<DataDownloader> logger)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
-            log = logger.CreateLogger<DataDownloader>();
+            log = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task DownloadFile(Uri url, string output, bool always = false)
