@@ -23,7 +23,7 @@ namespace Wikiled.Common.Utilities.Tests.Resources
                 Directory.Delete(output, true);
             }
 
-            instance = new DataDownloader(new NullLoggerFactory());
+            instance = new DataDownloader(new NullLogger<DataDownloader>());
         }
 
         [Test]
