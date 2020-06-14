@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-namespace Wikiled.Common.Utilities.Resources.Config
+﻿namespace Wikiled.Common.Utilities.Resources.Config
 {
     public class ResourceConfig : ILocalDownload
     {
