@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Reflection;
-using Castle.DynamicProxy.Internal;
 
 namespace Wikiled.Common.Testing.Utilities.Reflection
 {
@@ -65,6 +64,11 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                     }
                 }
             }
+        }
+
+        public static bool IsNullableType(this Type type)
+        {
+            return type.GetTypeInfo().IsGenericType && (object)type.GetGenericTypeDefinition() == (object)typeof(Nullable<>);
         }
     }
 }

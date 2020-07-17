@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Wikiled.Common.Logging;
 
 namespace Wikiled.Common.Utilities.Resources.Config
 {
@@ -13,6 +10,5 @@ namespace Wikiled.Common.Utilities.Resources.Config
         {
             return Path.Combine(download.Resources ?? string.Empty, config(download).Local);
         }
-
     }
 }
