@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,12 +10,14 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
     public class OAuthHelper : IOAuthHelper
     {
         private readonly ILogger<OAuthHelper> logger;
+
         private string redirectUri;
 
-        public OAuthHelper(ILogger<OAuthHelper> logger, int? port = null)
+        public OAuthHelper(ILogger<OAuthHelper> logger, OAuthConfig config)
         {
-            this.logger = logger;
-            RedirectUri = $"http://{IPAddress.Loopback}:{port ?? GetRandomUnusedPort()}/";
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            RedirectUri = $"http://{IPAddress.Loopback}:{config.Port ?? GetRandomUnusedPort()}/{config.Path}";
             logger.LogInformation("redirect URI: " + RedirectUri);
         }
 
