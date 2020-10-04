@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
 
         public bool IsSuccessful { get; private set; }
 
-        public async Task Start(string serviceUrl, string state = null)
+        public async Task Start(string serviceUrl)
         {
             IsSuccessful = false;
             var http = new HttpListener();
@@ -57,7 +58,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
             var responseString = "<html><head><meta http-equiv='refresh' content='10;url=https://google.com'></head><body>Please return to the app.</body></html>";
             var buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buffer.Length;
-            System.IO.Stream responseOutput = response.OutputStream;
+            Stream responseOutput = response.OutputStream;
             Task responseTask = responseOutput.WriteAsync(buffer, 0, buffer.Length)
                                               .ContinueWith(
                                                   task =>
@@ -74,7 +75,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
                 return;
             }
 
-            if (context.Request.QueryString.Get("code") == null || context.Request.QueryString.Get("state") == null)
+            if (context.Request.QueryString.Get("code") == null)
             {
                 logger.LogInformation("Malformed authorization response. " + context.Request.QueryString);
                 return;
@@ -82,17 +83,6 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
 
             // extracts the code
             var code = context.Request.QueryString.Get("code");
-            var incomingState = context.Request.QueryString.Get("state");
-
-            // Compares the received state to the expected value, to ensure that
-            // this app made the request which resulted in authorization.
-            if (state != null &&
-                incomingState != state)
-            {
-                logger.LogInformation($"Received request with invalid state ({incomingState})");
-                return;
-            }
-
             logger.LogInformation("Authorization code: " + code);
             Code = code;
             IsSuccessful = true;

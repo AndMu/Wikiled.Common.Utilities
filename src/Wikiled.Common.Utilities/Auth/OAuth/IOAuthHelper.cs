@@ -10,6 +10,6 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
 
         bool IsSuccessful { get; }
 
-        Task Start(string serviceUrl, string state = null);
+        Task Start(string serviceUrl);
     }
 }
