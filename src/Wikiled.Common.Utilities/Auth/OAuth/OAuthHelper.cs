@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,12 +11,14 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
     public class OAuthHelper : IOAuthHelper
     {
         private readonly ILogger<OAuthHelper> logger;
+
         private string redirectUri;
 
-        public OAuthHelper(ILogger<OAuthHelper> logger, int? port = null)
+        public OAuthHelper(ILogger<OAuthHelper> logger, OAuthConfig config)
         {
-            this.logger = logger;
-            RedirectUri = $"http://{IPAddress.Loopback}:{port ?? GetRandomUnusedPort()}/";
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            RedirectUri = $"http://{IPAddress.Loopback}:{config.Port ?? GetRandomUnusedPort()}/{config.Path}";
             logger.LogInformation("redirect URI: " + RedirectUri);
         }
 
@@ -35,7 +39,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
 
         public bool IsSuccessful { get; private set; }
 
-        public async Task Start(string serviceUrl, string state = null)
+        public async Task Start(string serviceUrl)
         {
             IsSuccessful = false;
             var http = new HttpListener();
@@ -54,7 +58,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
             var responseString = "<html><head><meta http-equiv='refresh' content='10;url=https://google.com'></head><body>Please return to the app.</body></html>";
             var buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buffer.Length;
-            System.IO.Stream responseOutput = response.OutputStream;
+            Stream responseOutput = response.OutputStream;
             Task responseTask = responseOutput.WriteAsync(buffer, 0, buffer.Length)
                                               .ContinueWith(
                                                   task =>
@@ -71,7 +75,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
                 return;
             }
 
-            if (context.Request.QueryString.Get("code") == null || context.Request.QueryString.Get("state") == null)
+            if (context.Request.QueryString.Get("code") == null)
             {
                 logger.LogInformation("Malformed authorization response. " + context.Request.QueryString);
                 return;
@@ -79,17 +83,6 @@ namespace Wikiled.Common.Utilities.Auth.OAuth
 
             // extracts the code
             var code = context.Request.QueryString.Get("code");
-            var incomingState = context.Request.QueryString.Get("state");
-
-            // Compares the received state to the expected value, to ensure that
-            // this app made the request which resulted in authorization.
-            if (state != null &&
-                incomingState != state)
-            {
-                logger.LogInformation($"Received request with invalid state ({incomingState})");
-                return;
-            }
-
             logger.LogInformation("Authorization code: " + code);
             Code = code;
             IsSuccessful = true;
