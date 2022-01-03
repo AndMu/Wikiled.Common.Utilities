@@ -2,6 +2,7 @@ using System;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
+using Microsoft.IO;
 using Newtonsoft.Json;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
@@ -51,7 +52,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public void Construct()
         {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException<JObjectSerialiser>(MemoryStreamInstances.MemoryStream);
+            ConstructorHelper.ConstructorMustThrowArgumentNullException<JObjectSerialiser>(type => type == typeof(RecyclableMemoryStreamManager) ? MemoryStreamInstances.MemoryStream : null);
         }
 
         private JObjectSerialiser CreateJObjectSerialiser()

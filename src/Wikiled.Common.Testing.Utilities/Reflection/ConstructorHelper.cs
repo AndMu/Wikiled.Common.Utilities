@@ -8,15 +8,13 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
 {
     public static class ConstructorHelper
     {
-        public static void ConstructorMustThrowArgumentNullException<T>(params object[] args)
+        public static void ConstructorMustThrowArgumentNullException<T>(Func<Type, object> construct = null, Func<Type, int, bool> canBeNull = null)
         {
-            ConstructorMustThrowArgumentNullException(typeof(T), args);
+            ConstructorMustThrowArgumentNullException(typeof(T), construct, canBeNull);
         }
 
-        public static void ConstructorMustThrowArgumentNullException(Type type, params object[] args)
+        public static void ConstructorMustThrowArgumentNullException(Type type, Func<Type, object> construct = null, Func<Type, int, bool> canBeNull = null)
         {
-            var lookup = args.ToLookup(item => item.GetType(), item => item);
-
             foreach (var constructor in type.GetConstructors())
             {
                 var parameters = constructor.GetParameters();
@@ -24,9 +22,10 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                 var arguments = parameters.Select(
                                               p =>
                                               {
-                                                  if (lookup.Contains(p.ParameterType))
+                                                  var value = construct?.Invoke(p.ParameterType);
+                                                  if (value != null)
                                                   {
-                                                      return lookup[p.ParameterType].First();
+                                                      return value;
                                                   }
 
                                                   if (p.ParameterType.IsEnum)
@@ -34,41 +33,55 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                                                       return p.ParameterType.GetEnumValues().GetValue(0);
                                                   }
 
-                                                  Type mockType = typeof(Mock<>).MakeGenericType(p.ParameterType);
-                                                  return ((Mock) Activator.CreateInstance(mockType)).Object;
+                                                  if (p.ParameterType.IsValueType)
+                                                  {
+                                                      return Activator.CreateInstance(p.ParameterType);
+                                                  }
+
+                                                  if (p.ParameterType == typeof(string))
+                                                  {
+                                                      return "Test";
+                                                  }
+
+                                                  var mockType = typeof(Mock<>).MakeGenericType(p.ParameterType);
+                                                  return ((Mock)Activator.CreateInstance(mockType)).Object;
                                               })
                                           .ToArray();
 
-                for (int i = 0; i < parameters.Length; i++)
+                for (var i = 0; i < parameters.Length; i++)
                 {
                     var mocksCopy = arguments.ToArray();
 
-                    if (!mocksCopy[i].GetType().IsNullableType())
+                    var argType = mocksCopy[i].GetType();
+
+                    if (canBeNull != null && !canBeNull(argType, i))
                     {
                         continue;
                     }
 
-                    mocksCopy[i] = null;
+                    if (argType.IsValueType)
+                    {
+                        if (Nullable.GetUnderlyingType(argType) == null)
+                        {
+                            continue;
+                        }
+                    }
 
+                    mocksCopy[i] = null;
                     try
                     {
                         constructor.Invoke(mocksCopy);
-                        Assert.Fail("ArgumentNullException expected for parameter {0} of constructor, but no exception was thrown",
-                                    parameters[i].Name);
+                        Assert.Fail("ArgumentNullException expected for parameter {0} of constructor, but no exception was thrown", parameters[i].Name);
                     }
                     catch (TargetInvocationException ex)
                     {
-                        Assert.AreEqual(typeof(ArgumentNullException),
-                                        ex.InnerException?.GetType(),
-                                        $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
+                        Assert.AreEqual(
+                            typeof(ArgumentNullException),
+                            ex.InnerException?.GetType(),
+                            $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
                     }
                 }
             }
-        }
-
-        public static bool IsNullableType(this Type type)
-        {
-            return type.GetTypeInfo().IsGenericType && (object)type.GetGenericTypeDefinition() == (object)typeof(Nullable<>);
         }
     }
 }

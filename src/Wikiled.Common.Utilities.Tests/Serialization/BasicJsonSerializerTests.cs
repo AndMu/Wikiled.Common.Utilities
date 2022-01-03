@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.IO;
 using Wikiled.Common.Extensions;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
@@ -39,7 +40,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public void Construct()
         {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), MemoryStreamInstances.MemoryStream);
+            ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), type => type == typeof(RecyclableMemoryStreamManager) ? MemoryStreamInstances.MemoryStream : null);
         }
 
         [Test]
