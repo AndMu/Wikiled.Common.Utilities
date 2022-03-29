@@ -2,7 +2,6 @@ using System;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
-using Microsoft.IO;
 using Newtonsoft.Json;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
