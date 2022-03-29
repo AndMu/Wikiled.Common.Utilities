@@ -40,7 +40,8 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public void Construct()
         {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException(typeof(BasicJsonSerializer), type => type == typeof(RecyclableMemoryStreamManager) ? MemoryStreamInstances.MemoryStream : null);
+            ConstructorHelper.ConstructorMustThrowArgumentNullException<BasicJsonSerializer>(
+                TypeSubstitute.Create().Add(MemoryStreamInstances.MemoryStream));
         }
 
         [Test]

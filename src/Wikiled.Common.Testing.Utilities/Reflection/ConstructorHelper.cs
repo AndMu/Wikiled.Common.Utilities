@@ -8,12 +8,12 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
 {
     public static class ConstructorHelper
     {
-        public static void ConstructorMustThrowArgumentNullException<T>(Func<Type, object> construct = null, Func<Type, int, bool> canBeNull = null)
+        public static void ConstructorMustThrowArgumentNullException<T>(TypeSubstitute? substitute = null)
         {
-            ConstructorMustThrowArgumentNullException(typeof(T), construct, canBeNull);
+            ConstructorMustThrowArgumentNullException(typeof(T), substitute);
         }
 
-        public static void ConstructorMustThrowArgumentNullException(Type type, Func<Type, object> construct = null, Func<Type, int, bool> canBeNull = null)
+        public static void ConstructorMustThrowArgumentNullException(Type type, TypeSubstitute? substitute = null)
         {
             foreach (var constructor in type.GetConstructors())
             {
@@ -22,7 +22,7 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                 var arguments = parameters.Select(
                                               p =>
                                               {
-                                                  var value = construct?.Invoke(p.ParameterType);
+                                                  var value = substitute?.Construct(p.ParameterType);
                                                   if (value != null)
                                                   {
                                                       return value;
@@ -54,7 +54,7 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
 
                     var argType = mocksCopy[i].GetType();
 
-                    if (canBeNull != null && !canBeNull(argType, i))
+                    if (substitute?.ChechNotNull(argType, i) == true)
                     {
                         continue;
                     }
