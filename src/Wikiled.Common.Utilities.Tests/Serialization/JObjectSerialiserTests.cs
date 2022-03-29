@@ -52,7 +52,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public void Construct()
         {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException<JObjectSerialiser>(type => type == typeof(RecyclableMemoryStreamManager) ? MemoryStreamInstances.MemoryStream : null);
+            ConstructorHelper.ConstructorMustThrowArgumentNullException<JObjectSerialiser>(TypeSubstitute.Create().Add(MemoryStreamInstances.MemoryStream));
         }
 
         private JObjectSerialiser CreateJObjectSerialiser()
