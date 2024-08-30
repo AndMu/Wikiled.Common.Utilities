@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Wikiled.Common.Utilities.Helpers;
 
@@ -10,8 +11,8 @@ public static class ObjectCloner
         {
             return default(T);
         }
-            
-        var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
-        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(source), deserializeSettings);
+
+        var deserializeSettings = new JsonSerializerOptions { PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace };
+        return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(source), deserializeSettings);
     }
 }
