@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using System;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Config;
 using Wikiled.Common.Utilities.Performance;
 
@@ -26,7 +27,7 @@ namespace Wikiled.Common.Utilities.Tests.Performance
         [Test]
         public void Arguments()
         {
-            Assert.Throws<ArgumentNullException>(() => instance.Add(null));
+            ClassicAssert.Throws<ArgumentNullException>(() => instance.Add(null));
         }
 
         [Test]
@@ -38,11 +39,11 @@ namespace Wikiled.Common.Utilities.Tests.Performance
             instance.Add(data);
             instance.Recalculate();
 
-            Assert.AreEqual(40, instance.Average.UserCpuUsed);
-            Assert.AreEqual(200, instance.Average.WorkingSet);
+            ClassicAssert.AreEqual(40, instance.Average.UserCpuUsed);
+            ClassicAssert.AreEqual(200, instance.Average.WorkingSet);
 
-            Assert.AreEqual(40, instance.Max.UserCpuUsed);
-            Assert.AreEqual(200, instance.Max.WorkingSet);
+            ClassicAssert.AreEqual(40, instance.Max.UserCpuUsed);
+            ClassicAssert.AreEqual(200, instance.Max.WorkingSet);
 
 
             data = new SystemUsageData();
@@ -51,11 +52,11 @@ namespace Wikiled.Common.Utilities.Tests.Performance
             instance.Add(data);
             instance.Recalculate();
 
-            Assert.AreEqual(30, instance.Average.UserCpuUsed);
-            Assert.AreEqual(150, instance.Average.WorkingSet);
+            ClassicAssert.AreEqual(30, instance.Average.UserCpuUsed);
+            ClassicAssert.AreEqual(150, instance.Average.WorkingSet);
 
-            Assert.AreEqual(40, instance.Max.UserCpuUsed);
-            Assert.AreEqual(200, instance.Max.WorkingSet);
+            ClassicAssert.AreEqual(40, instance.Max.UserCpuUsed);
+            ClassicAssert.AreEqual(200, instance.Max.WorkingSet);
         }
 
         [Test]
@@ -67,34 +68,34 @@ namespace Wikiled.Common.Utilities.Tests.Performance
             instance.Add(data);
             instance.Recalculate();
 
-            Assert.AreEqual(40, instance.Average.UserCpuUsed);
-            Assert.AreEqual(200, instance.Average.WorkingSet);
+            ClassicAssert.AreEqual(40, instance.Average.UserCpuUsed);
+            ClassicAssert.AreEqual(200, instance.Average.WorkingSet);
 
             configuration.Setup(item => item.Now).Returns(DateTime.UtcNow.AddHours(1));
             instance.RemoveOlder(TimeSpan.FromMinutes(1));
             instance.Recalculate();
 
-            Assert.AreEqual(0, instance.Average.UserCpuUsed);
-            Assert.AreEqual(0, instance.Average.WorkingSet);
+            ClassicAssert.AreEqual(0, instance.Average.UserCpuUsed);
+            ClassicAssert.AreEqual(0, instance.Average.WorkingSet);
 
-            Assert.AreEqual(0, instance.Max.UserCpuUsed);
-            Assert.AreEqual(0, instance.Max.WorkingSet);
+            ClassicAssert.AreEqual(0, instance.Max.UserCpuUsed);
+            ClassicAssert.AreEqual(0, instance.Max.WorkingSet);
         }
 
         [Test]
         public void Empty()
         {
-            Assert.AreEqual(0, instance.Average.UserCpuUsed);
-            Assert.AreEqual(0, instance.Average.WorkingSet);
+            ClassicAssert.AreEqual(0, instance.Average.UserCpuUsed);
+            ClassicAssert.AreEqual(0, instance.Average.WorkingSet);
 
-            Assert.AreEqual(0, instance.Max.UserCpuUsed);
-            Assert.AreEqual(0, instance.Max.WorkingSet);
+            ClassicAssert.AreEqual(0, instance.Max.UserCpuUsed);
+            ClassicAssert.AreEqual(0, instance.Max.WorkingSet);
         }
 
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentNullException>(() => new SystemUsageBucket(null));
+            ClassicAssert.Throws<ArgumentNullException>(() => new SystemUsageBucket(null));
         }
 
         private SystemUsageBucket CreateInstance()

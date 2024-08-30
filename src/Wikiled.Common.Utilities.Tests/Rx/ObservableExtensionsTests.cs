@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Rx;
 
 namespace Wikiled.Common.Utilities.Tests.Rx
@@ -24,11 +25,11 @@ namespace Wikiled.Common.Utilities.Tests.Rx
             var observable = Observable.Interval(TimeSpan.FromSeconds(1), scheduler);
             int total = 0;
             observable = observable.CountSubscribers(item => total = item);
-            Assert.AreEqual(0, total);
+            ClassicAssert.AreEqual(0, total);
             var subs = observable.Subscribe(item => { });
-            Assert.AreEqual(1, total);
+            ClassicAssert.AreEqual(1, total);
             subs.Dispose();
-            Assert.AreEqual(0, total);
+            ClassicAssert.AreEqual(0, total);
         }
 
         [Test]

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Helpers;
 
 namespace Wikiled.Common.Utilities.Tests.Helpers
@@ -12,8 +13,8 @@ namespace Wikiled.Common.Utilities.Tests.Helpers
             DataInstance instance = new DataInstance();
             instance.Text = "One";
             var result = instance.CloneJson();
-            Assert.AreNotSame(instance, result);
-            Assert.AreEqual(instance.Text, result.Text);
+            ClassicAssert.AreNotSame(instance, result);
+            ClassicAssert.AreEqual(instance.Text, result.Text);
         }
 
         [Test]
@@ -21,7 +22,7 @@ namespace Wikiled.Common.Utilities.Tests.Helpers
         {
             DataInstance instance = null;
             var result = instance.CloneJson();
-            Assert.IsNull(result);
+            ClassicAssert.IsNull(result);
         }
     }
 }

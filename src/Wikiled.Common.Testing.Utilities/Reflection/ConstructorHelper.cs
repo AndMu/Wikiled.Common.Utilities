@@ -1,5 +1,4 @@
 ﻿using Moq;
-using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -71,14 +70,15 @@ namespace Wikiled.Common.Testing.Utilities.Reflection
                     try
                     {
                         constructor.Invoke(mocksCopy);
-                        Assert.Fail("ArgumentNullException expected for parameter {0} of constructor, but no exception was thrown", parameters[i].Name);
+                        throw new Exception($"ArgumentNullException expected for parameter {parameters[i].Name} of constructor, but no exception was thrown");
                     }
                     catch (TargetInvocationException ex)
                     {
-                        Assert.AreEqual(
-                            typeof(ArgumentNullException),
-                            ex.InnerException?.GetType(),
-                            $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
+                        if (ex.InnerException?.GetType() != typeof(ArgumentNullException))
+                        {
+                            throw new Exception(
+                                $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
+                        }
                     }
                 }
             }

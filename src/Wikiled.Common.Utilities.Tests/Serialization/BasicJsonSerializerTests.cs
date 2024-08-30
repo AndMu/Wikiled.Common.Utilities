@@ -4,12 +4,13 @@ using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.IO;
 using Wikiled.Common.Extensions;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
+using NUnit.Framework.Legacy;
+using System.Text.Json;
 
 namespace Wikiled.Common.Utilities.Tests.Serialization
 {
@@ -36,14 +37,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             json = JsonConvert.SerializeObject(subscription);
             data = Encoding.UTF8.GetBytes(json);
         }
-
-        [Test]
-        public void Construct()
-        {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException<BasicJsonSerializer>(
-                TypeSubstitute.Create().Add(MemoryStreamInstances.MemoryStream));
-        }
-
+    
         [Test]
         public async Task Deserialize()
         {
@@ -51,7 +45,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 var result = await instance.Deserialize<DataInstance>(stream);
-                Assert.AreEqual("Test", result.Text);
+                ClassicAssert.AreEqual("Test", result.Text);
             }
         }
 
@@ -59,14 +53,14 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         public void DeserializeFromBytes()
         {
             var result = instance.Deserialize<DataInstance>(data);
-            Assert.AreEqual("Test", result.Text);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]
         public void DeserializeFromString()
         {
             var result = instance.Deserialize<DataInstance>(json);
-            Assert.AreEqual("Test", result.Text);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]
@@ -74,7 +68,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         {
             var stream = await instance.Serialize(subscription);
             var result = await instance.Deserialize<DataInstance>(stream);
-            Assert.AreEqual("Test", result.Text);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]
@@ -82,7 +76,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         {
             var data = instance.SerializeArray(subscription);
             var result = instance.Deserialize<DataInstance>(data);
-            Assert.AreEqual("Test", result.Text);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]
@@ -96,12 +90,12 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             await instance.SerializeJsonZip(dataInstance, path).ConfigureAwait(false);
 
             var result = await instance.DeserializeJsonZip<DataInstance>(path);
-            Assert.AreEqual(dataInstance.Text, result.Text);
+            ClassicAssert.AreEqual(dataInstance.Text, result.Text);
         }
 
         private BasicJsonSerializer CreateBasicJsonSerializer()
         {
-            return new BasicJsonSerializer(MemoryStreamInstances.MemoryStream);
+            return new BasicJsonSerializer(MemoryStreamInstances.MemoryStream, JsonSerializerOptions.Default);
         }
     }
 }

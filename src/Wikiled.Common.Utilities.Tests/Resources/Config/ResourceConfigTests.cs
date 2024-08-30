@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Resources.Config;
 
 namespace Wikiled.Common.Utilities.Tests.Resources.Config
@@ -14,7 +15,7 @@ namespace Wikiled.Common.Utilities.Tests.Resources.Config
             config.Location = new LocationConfig();
             config.Location.Local = "3";
             var result = config.GetFullPath(item => item.Location);
-            Assert.AreEqual(@"Test\3", result);
+            ClassicAssert.AreEqual(@"Test\3", result);
         }
     }
 }

@@ -11,10 +11,10 @@ namespace Wikiled.Common.Utilities.Serialization
     {
         private readonly RecyclableMemoryStreamManager memoryStream;
 
-        public BasicJsonSerializer(RecyclableMemoryStreamManager memoryStream)
+        public BasicJsonSerializer(RecyclableMemoryStreamManager memoryStream, JsonSerializerOptions options)
         {
             this.memoryStream = memoryStream ?? throw new ArgumentNullException(nameof(memoryStream));
-            Options = new JsonSerializerOptions();
+            Options = options;
         }
 
         public JsonSerializerOptions Options { get; }

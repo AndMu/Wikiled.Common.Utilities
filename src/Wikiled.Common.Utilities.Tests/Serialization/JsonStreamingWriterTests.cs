@@ -2,6 +2,7 @@
 using Microsoft.IO;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Extensions;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
@@ -33,7 +34,7 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
             }
 
             var result = JsonConvert.DeserializeObject<DataInstance[]>(File.ReadAllText(path));
-            Assert.AreEqual(2, result.Length);
+            ClassicAssert.AreEqual(2, result.Length);
         }
 
         [Test]

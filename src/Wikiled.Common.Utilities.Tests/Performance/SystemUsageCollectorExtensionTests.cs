@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Performance;
 
 namespace Wikiled.Common.Utilities.Tests.Performance
@@ -17,7 +18,7 @@ namespace Wikiled.Common.Utilities.Tests.Performance
             collector.Setup(item => item.WorkingSet).Returns(memory);
             collector.Setup(item => item.TotalCpuUsed).Returns(cpu);
             collector.Setup(item => item.UserCpuUsed).Returns(userCpu);
-            Assert.AreEqual(expected, collector.Object.GetBasic());
+            ClassicAssert.AreEqual(expected, collector.Object.GetBasic());
         }
     }
 }

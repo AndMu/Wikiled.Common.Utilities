@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Performance;
 
 namespace Wikiled.Common.Utilities.Tests.Performance
@@ -18,12 +19,12 @@ namespace Wikiled.Common.Utilities.Tests.Performance
         public void Collect()
         {
             instance.Refresh();
-            Assert.Greater(instance.PagedMemory, 0);
-            Assert.Greater(instance.NonPagedSystemMemory, 0);
-            Assert.Greater(instance.PrivateMemory, 0);
-            Assert.Greater(instance.PagedSystemMemory, 0);
-            Assert.Greater(instance.WorkingSet, 0);
-            Assert.GreaterOrEqual(instance.UserCpuUsed, 0);
+            ClassicAssert.Greater(instance.PagedMemory, 0);
+            ClassicAssert.Greater(instance.NonPagedSystemMemory, 0);
+            ClassicAssert.Greater(instance.PrivateMemory, 0);
+            ClassicAssert.Greater(instance.PagedSystemMemory, 0);
+            ClassicAssert.Greater(instance.WorkingSet, 0);
+            ClassicAssert.GreaterOrEqual(instance.UserCpuUsed, 0);
         }
 
         private SystemUsageCollector CreateInstance()

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Xml.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Modules;
 
 namespace Wikiled.Common.Utilities.Tests.Modules
@@ -23,7 +24,7 @@ namespace Wikiled.Common.Utilities.Tests.Modules
             collection.AddAsyncFactory(collection => Task.FromResult("Test"));
             var provider = collection.BuildServiceProvider();
             var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
-            Assert.AreEqual("Test", result);
+            ClassicAssert.AreEqual("Test", result);
         }
 
         [Test]
@@ -33,7 +34,7 @@ namespace Wikiled.Common.Utilities.Tests.Modules
             collection.AddAsyncFactory<string>((collection, text) => Task.CompletedTask);
             var provider = collection.BuildServiceProvider();
             var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
-            Assert.AreEqual("Test", result);
+            ClassicAssert.AreEqual("Test", result);
         }
 
         [Test]
@@ -43,11 +44,11 @@ namespace Wikiled.Common.Utilities.Tests.Modules
             collection.AddAsyncFactory(collection => Task.FromResult((object)total++));
             var provider = collection.BuildServiceProvider();
             var result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
-            Assert.AreEqual(0, result);
+            ClassicAssert.AreEqual(0, result);
             result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
-            Assert.AreEqual(0, result);
+            ClassicAssert.AreEqual(0, result);
             result = await provider.GetService<IAsyncServiceFactory<object>>().GetService(true);
-            Assert.AreEqual(1, result);
+            ClassicAssert.AreEqual(1, result);
         }
     }
 }

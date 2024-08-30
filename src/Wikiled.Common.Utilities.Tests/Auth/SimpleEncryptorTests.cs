@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Auth;
 
 namespace Wikiled.Common.Utilities.Tests.Auth
@@ -18,9 +19,9 @@ namespace Wikiled.Common.Utilities.Tests.Auth
         public void Encrypt(string text, string pass)
         {
             var encrypted = instance.EncryptString(text, pass);
-            Assert.AreNotEqual(text, encrypted);
+            ClassicAssert.AreNotEqual(text, encrypted);
             var decrypted = instance.DecryptString(encrypted, pass);
-            Assert.AreEqual(text, decrypted);
+            ClassicAssert.AreEqual(text, decrypted);
         }
 
         private SimpleEncryptor CreateInstance()

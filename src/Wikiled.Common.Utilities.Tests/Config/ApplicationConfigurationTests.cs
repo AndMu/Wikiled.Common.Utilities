@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Config;
 
 namespace Wikiled.Common.Utilities.Tests.Config
@@ -22,7 +23,7 @@ namespace Wikiled.Common.Utilities.Tests.Config
         {
             var dateTime = new DateTime(2012, 01, day);
             var result = instance.IsWorkDay(dateTime);
-            Assert.AreEqual(expected, result);
+            ClassicAssert.AreEqual(expected, result);
         }
 
         [TestCase(1, 2)]
@@ -32,7 +33,7 @@ namespace Wikiled.Common.Utilities.Tests.Config
         {
             var dateTime = new DateTime(2012, 01, day);
             var result = instance.GetWorkDay(dateTime);
-            Assert.AreEqual(workday, result.Day);
+            ClassicAssert.AreEqual(workday, result.Day);
         }
     }
 }

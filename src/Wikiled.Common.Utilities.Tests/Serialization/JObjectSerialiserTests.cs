@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
@@ -34,18 +35,16 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         public void DeserializeJObject()
         {
             var result = instance.Deserialize(data).ToObject<DataInstance>();
-            Assert.AreEqual("Test", result.Text);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]
         public void DeserializeJObjectFromBytes()
         {
-            using (Stream stream = new MemoryStream(data))
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                var result = instance.Deserialize(stream).ToObject<DataInstance>();
-                Assert.AreEqual("Test", result.Text);
-            }
+            using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            var result = instance.Deserialize(stream).ToObject<DataInstance>();
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]

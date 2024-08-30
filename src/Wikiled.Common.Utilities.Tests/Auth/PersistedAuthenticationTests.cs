@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Auth;
 
 namespace Wikiled.Common.Utilities.Tests.Auth
@@ -31,8 +32,8 @@ namespace Wikiled.Common.Utilities.Tests.Auth
         [Test]
         public void Construct()
         {
-            Assert.Throws<ArgumentNullException>(() => new PersistedAuthentication<TestToken>(null, mockAuthentication.Object));
-            Assert.Throws<ArgumentNullException>(() => new PersistedAuthentication<TestToken>(mockLogger, null));
+            ClassicAssert.Throws<ArgumentNullException>(() => new PersistedAuthentication<TestToken>(null, mockAuthentication.Object));
+            ClassicAssert.Throws<ArgumentNullException>(() => new PersistedAuthentication<TestToken>(mockLogger, null));
         }
 
         [Test]
@@ -40,7 +41,7 @@ namespace Wikiled.Common.Utilities.Tests.Auth
         {
             mockAuthentication.Setup(item => item.Authenticate()).Returns(Task.FromResult(new TestToken { Token = "Token" }));
             var result = await instance.Authenticate().ConfigureAwait(false);
-            Assert.AreEqual("Token", result.Token);
+            ClassicAssert.AreEqual("Token", result.Token);
         }
 
         [Test]
@@ -49,19 +50,19 @@ namespace Wikiled.Common.Utilities.Tests.Auth
             mockAuthentication.Setup(item => item.Authenticate()).Returns(Task.FromResult(new TestToken { Token = "Token" }));
             mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(Task.FromResult(new TestToken { Token = "Token2" }));
             var result = await instance.Authenticate().ConfigureAwait(false);
-            Assert.AreEqual("Token", result.Token);
+            ClassicAssert.AreEqual("Token", result.Token);
 
             result = await instance.Authenticate().ConfigureAwait(false);
-            Assert.AreEqual("Token2", result.Token);
+            ClassicAssert.AreEqual("Token2", result.Token);
         }
 
         [Test]
         public async Task Refresh()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => instance.Refresh(null));
+            ClassicAssert.ThrowsAsync<ArgumentNullException>(() => instance.Refresh(null));
             mockAuthentication.Setup(item => item.Refresh(It.IsAny<TestToken>())).Returns(Task.FromResult(new TestToken { Token = "Token2" }));
             var result = await instance.Refresh(new TestToken()).ConfigureAwait(false);
-            Assert.AreEqual("Token2", result.Token);
+            ClassicAssert.AreEqual("Token2", result.Token);
         }
 
         private PersistedAuthentication<TestToken> CreateInstance()
