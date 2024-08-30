@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Wikiled.Common.Utilities.Rx
+namespace Wikiled.Common.Utilities.Rx;
+
+public interface IObservableTimer
 {
-    public interface IObservableTimer
-    {
-        IObservable<long> Daily(params TimeSpan[] times);
-    }
+    IObservable<long> Daily(params TimeSpan[] times);
 }

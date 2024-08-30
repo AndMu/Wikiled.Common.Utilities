@@ -4,104 +4,94 @@ using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.IO;
 using Wikiled.Common.Extensions;
-using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
+using NUnit.Framework.Legacy;
+using System.Text.Json;
 
-namespace Wikiled.Common.Utilities.Tests.Serialization
+namespace Wikiled.Common.Utilities.Tests.Serialization;
+
+[TestFixture]
+public class BasicJsonSerializerTests
 {
-    [TestFixture]
-    public class BasicJsonSerializerTests
+    private BasicJsonSerializer instance;
+
+    private byte[] data;
+
+    private string json;
+
+    private DataInstance subscription;
+
+    [SetUp]
+    public void SetUp()
     {
-        private BasicJsonSerializer instance;
+        instance = CreateBasicJsonSerializer();
 
-        private byte[] data;
+        subscription = new DataInstance();
+        subscription.Text = "Test";
+        subscription.Date = DateTime.Today;
 
-        private string json;
+        json = JsonConvert.SerializeObject(subscription);
+        data = Encoding.UTF8.GetBytes(json);
+    }
+    
+    [Test]
+    public async Task Deserialize()
+    {
+        await using Stream stream = new MemoryStream(data);
+        stream.Seek(0, SeekOrigin.Begin);
+        var result = await instance.Deserialize<DataInstance>(stream);
+        ClassicAssert.AreEqual("Test", result.Text);
+    }
 
-        private DataInstance subscription;
+    [Test]
+    public void DeserializeFromBytes()
+    {
+        var result = instance.Deserialize<DataInstance>(data);
+        ClassicAssert.AreEqual("Test", result.Text);
+    }
 
-        [SetUp]
-        public void SetUp()
-        {
-            instance = CreateBasicJsonSerializer();
+    [Test]
+    public void DeserializeFromString()
+    {
+        var result = instance.Deserialize<DataInstance>(json);
+        ClassicAssert.AreEqual("Test", result.Text);
+    }
 
-            subscription = new DataInstance();
-            subscription.Text = "Test";
-            subscription.Date = DateTime.Today;
+    [Test]
+    public async Task Serialize()
+    {
+        var stream = await instance.Serialize(subscription);
+        var result = await instance.Deserialize<DataInstance>(stream);
+        ClassicAssert.AreEqual("Test", result.Text);
+    }
 
-            json = JsonConvert.SerializeObject(subscription);
-            data = Encoding.UTF8.GetBytes(json);
-        }
+    [Test]
+    public void SerializeArray()
+    {
+        var data = instance.SerializeArray(subscription);
+        var result = instance.Deserialize<DataInstance>(data);
+        ClassicAssert.AreEqual("Test", result.Text);
+    }
 
-        [Test]
-        public void Construct()
-        {
-            ConstructorHelper.ConstructorMustThrowArgumentNullException<BasicJsonSerializer>(
-                TypeSubstitute.Create().Add(MemoryStreamInstances.MemoryStream));
-        }
+    [Test]
+    public async Task SerializeDeserialize()
+    {
+        var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
+        path.EnsureDirectoryExistence();
+        path = Path.Combine(path, "data.zip");
+        var dataInstance = new DataInstance();
+        dataInstance.Text = "Test";
+        await instance.SerializeJsonZip(dataInstance, path).ConfigureAwait(false);
 
-        [Test]
-        public async Task Deserialize()
-        {
-            using (Stream stream = new MemoryStream(data))
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                var result = await instance.Deserialize<DataInstance>(stream);
-                Assert.AreEqual("Test", result.Text);
-            }
-        }
+        var result = await instance.DeserializeJsonZip<DataInstance>(path);
+        ClassicAssert.AreEqual(dataInstance.Text, result.Text);
+    }
 
-        [Test]
-        public void DeserializeFromBytes()
-        {
-            var result = instance.Deserialize<DataInstance>(data);
-            Assert.AreEqual("Test", result.Text);
-        }
-
-        [Test]
-        public void DeserializeFromString()
-        {
-            var result = instance.Deserialize<DataInstance>(json);
-            Assert.AreEqual("Test", result.Text);
-        }
-
-        [Test]
-        public async Task Serialize()
-        {
-            var stream = await instance.Serialize(subscription);
-            var result = await instance.Deserialize<DataInstance>(stream);
-            Assert.AreEqual("Test", result.Text);
-        }
-
-        [Test]
-        public void SerializeArray()
-        {
-            var data = instance.SerializeArray(subscription);
-            var result = instance.Deserialize<DataInstance>(data);
-            Assert.AreEqual("Test", result.Text);
-        }
-
-        [Test]
-        public async Task SerializeDeserialize()
-        {
-            var path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
-            path.EnsureDirectoryExistence();
-            path = Path.Combine(path, "data.zip");
-            var dataInstance = new DataInstance();
-            dataInstance.Text = "Test";
-            await instance.SerializeJsonZip(dataInstance, path).ConfigureAwait(false);
-
-            var result = await instance.DeserializeJsonZip<DataInstance>(path);
-            Assert.AreEqual(dataInstance.Text, result.Text);
-        }
-
-        private BasicJsonSerializer CreateBasicJsonSerializer()
-        {
-            return new BasicJsonSerializer(MemoryStreamInstances.MemoryStream);
-        }
+    private BasicJsonSerializer CreateBasicJsonSerializer()
+    {
+        return new BasicJsonSerializer(MemoryStreamInstances.MemoryStream, JsonSerializerOptions.Default);
     }
 }

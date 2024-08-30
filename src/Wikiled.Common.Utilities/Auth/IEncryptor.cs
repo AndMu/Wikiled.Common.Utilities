@@ -1,11 +1,10 @@
-﻿namespace Wikiled.Common.Utilities.Auth
+﻿namespace Wikiled.Common.Utilities.Auth;
+
+public interface IEncryptor
 {
-    public interface IEncryptor
-    {
-        string Salt { get; }
+    string Salt { get; }
 
-        string EncryptString(string plainText, string passPhrase);
+    string EncryptString(string plainText, string passPhrase);
 
-        string DecryptString(string cipherText, string passPhrase);
-    }
+    string DecryptString(string cipherText, string passPhrase);
 }

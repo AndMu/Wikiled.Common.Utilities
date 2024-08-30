@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
@@ -21,6 +21,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Wikiled.Common.Testing.Utilities\Wikiled.Common.Testing.Utilities.csproj" />
     <ProjectReference Include="..\Wikiled.Common.Utilities\Wikiled.Common.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Target Name="ForceGenerationOfBindingRedirects" AfterTargets="ResolveAssemblyReferences" BeforeTargets="GenerateBindingRedirects" Condition="'$(AutoGenerateBindingRedirects)' == 'true'">
     <PropertyGroup>

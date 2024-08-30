@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Wikiled.Common.Utilities.Modules
+namespace Wikiled.Common.Utilities.Modules;
+
+internal class ContainerServiceFactory<T> : IServiceFactory<T>
 {
-    internal class ContainerServiceFactory<T> : IServiceFactory<T>
-    {
-        readonly IServiceProvider services;
+    readonly IServiceProvider services;
 
-        public ContainerServiceFactory(IServiceProvider services) => this.services = services;
+    public ContainerServiceFactory(IServiceProvider services) => this.services = services;
 
-        public T GetService() => services.GetRequiredService<T>();
-    }
+    public T GetService() => services.GetRequiredService<T>();
 }
