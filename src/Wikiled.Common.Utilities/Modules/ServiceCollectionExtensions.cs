@@ -90,16 +90,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    public static IServiceCollection RegisterModule<TModule>(this IServiceCollection services)
-        where TModule : IModule, new()
-    {
-        return new TModule().ConfigureCommonServices(services);
-    }
-
-    public static IServiceCollection RegisterModule<TModule>(this IServiceCollection services, TModule module)
-        where TModule : IModule
-    {
-        return module.ConfigureCommonServices(services);
-    }
 }

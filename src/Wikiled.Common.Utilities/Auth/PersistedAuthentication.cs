@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Wikiled.Common.Utilities.Auth;
 
@@ -28,7 +27,7 @@ public class PersistedAuthentication<T> : IAuthentication<T>
         {
             log.LogInformation("Found saved credentials. Loading...");
             var json = File.ReadAllText(AuthFile);
-            return await Refresh(JsonConvert.DeserializeObject<T>(json)).ConfigureAwait(false);
+            return await Refresh(JsonSerializer.Deserialize<T>(json)).ConfigureAwait(false);
         }
 
         T credentials = await underlying.Authenticate().ConfigureAwait(false);
@@ -51,8 +50,7 @@ public class PersistedAuthentication<T> : IAuthentication<T>
 
     private void Save(T credentials)
     {
-        var json = JsonConvert.SerializeObject(credentials);
-        var jsonFormatted = JToken.Parse(json).ToString(Formatting.Indented);
-        File.WriteAllText(AuthFile, jsonFormatted);
+        var json = JsonSerializer.Serialize(credentials, JsonSerializerOptions.Default);
+        File.WriteAllText(AuthFile, json);
     }
 }

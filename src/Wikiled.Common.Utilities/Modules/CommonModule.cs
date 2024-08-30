@@ -9,16 +9,14 @@ using Wikiled.Common.Utilities.Serialization;
 
 namespace Wikiled.Common.Utilities.Modules;
 
-public class CommonModule : IModule
+public static class CommonModule
 {
-    public IServiceCollection ConfigureCommonServices(IServiceCollection service)
+    public static IServiceCollection AddCommonServices(IServiceCollection service)
     {
         service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
         service.AddSingleton<RecyclableMemoryStreamManager>();
-        service.AddSingleton<IJsonStreamingWriterFactory, JsonStreamingWriterFactory>();
         service.AddSingleton<IDataDownloader, DataDownloader>();
         service.AddTransient<IJsonSerializer, BasicJsonSerializer>();
-        service.AddTransient<IJObjectSerialiser, JObjectSerialiser>();
         service.AddTransient<IApplicationConfiguration, ApplicationConfiguration>();
         service.AddTransient<IObservableTimer, ObservableTimer>();
         service.AddTransient<ISystemUsageCollector, SystemUsageCollector>();
