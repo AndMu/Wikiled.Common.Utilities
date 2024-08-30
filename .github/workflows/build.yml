@@ -61,9 +61,10 @@ jobs:
     
     - name: Pack NuGet package
       run: |        
+        cd src
         dotnet pack -c Release -o out /p:Version=${VERSION}
     
     - name: Push NuGet package
       run: |
-        cd out
+        cd src/out
         dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source ${{ env.NUGET_SOURCE }} --skip-duplicate
