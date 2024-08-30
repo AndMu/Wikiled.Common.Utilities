@@ -8,6 +8,7 @@ env:
   DOTNET_CORE_VERSION: '8.0.x'
   MAJOR_VERSION: '1'
   MINOR_VERSION: '6'
+  REVISION_VERSION: '0'
   NUGET_SOURCE: 'https://api.nuget.org/v3/index.json'
 
 jobs:
@@ -28,9 +29,9 @@ jobs:
       id: set_version
       run: |
         if [ ${{ github.ref }} = 'refs/heads/master' ]; then
-          echo "VERSION=${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}" >> $GITHUB_ENV
+          echo "VERSION=${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.REVISION_VERSION }}.${{ github.run_number }}" >> $GITHUB_ENV
         else
-          echo "VERSION=${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}-dev" >> $GITHUB_ENV
+          echo "VERSION=${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.REVISION_VERSION }}.${{ github.run_number }}-dev" >> $GITHUB_ENV
         fi        
 
     - name: Create Git tag
