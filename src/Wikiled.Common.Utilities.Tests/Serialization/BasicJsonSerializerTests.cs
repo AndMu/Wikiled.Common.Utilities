@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Wikiled.Common.Extensions;
-using Wikiled.Common.Testing.Utilities.Reflection;
 using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
@@ -41,12 +40,10 @@ namespace Wikiled.Common.Utilities.Tests.Serialization
         [Test]
         public async Task Deserialize()
         {
-            using (Stream stream = new MemoryStream(data))
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                var result = await instance.Deserialize<DataInstance>(stream);
-                ClassicAssert.AreEqual("Test", result.Text);
-            }
+            await using Stream stream = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
+            var result = await instance.Deserialize<DataInstance>(stream);
+            ClassicAssert.AreEqual("Test", result.Text);
         }
 
         [Test]

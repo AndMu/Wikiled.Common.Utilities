@@ -30,13 +30,9 @@ namespace Wikiled.Common.Utilities.Resources
             }
 
             WebRequest request = WebRequest.Create(url);
-            using (WebResponse response = await request.GetResponseAsync().ConfigureAwait(false))
-            {
-                using (Stream stream = response.GetResponseStream())
-                {
-                    UnzipFromStream(stream, output);
-                }
-            }
+            using WebResponse response = await request.GetResponseAsync().ConfigureAwait(false);
+            using Stream stream = response.GetResponseStream();
+            UnzipFromStream(stream, output);
         }
 
         private void UnzipFromStream(Stream zipStream, string outFolder)
