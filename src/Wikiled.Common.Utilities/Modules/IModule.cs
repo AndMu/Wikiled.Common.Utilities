@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Wikiled.Common.Utilities.Modules
+namespace Wikiled.Common.Utilities.Modules;
+
+public interface IModule
 {
-    public interface IModule
-    {
-        IServiceCollection ConfigureServices(IServiceCollection services);
-    }
+    IServiceCollection ConfigureCommonServices(IServiceCollection services);
 }

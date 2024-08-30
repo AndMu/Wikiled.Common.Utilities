@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Wikiled.Common.Utilities.Tests.Helpers
-{
-    public class DataInstance
-    {
-        public string Text { get; set; }
+namespace Wikiled.Common.Utilities.Tests.Helpers;
 
-        public DateTime Date { get; set; }
-    }
+public class DataInstance
+{
+    public string Text { get; set; }
+
+    public DateTime Date { get; set; }
 }

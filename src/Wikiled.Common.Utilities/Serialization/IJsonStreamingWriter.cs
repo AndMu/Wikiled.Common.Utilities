@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Wikiled.Common.Utilities.Serialization
+namespace Wikiled.Common.Utilities.Serialization;
+
+public interface IJsonStreamingWriter
+    : IDisposable
 {
-    public interface IJsonStreamingWriter
-        : IDisposable
-    {
-        void WriteObject<T>(T instance);
-    }
+    void WriteObject<T>(T instance);
 }

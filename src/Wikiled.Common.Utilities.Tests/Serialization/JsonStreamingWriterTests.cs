@@ -2,50 +2,50 @@
 using Microsoft.IO;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Wikiled.Common.Extensions;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
 
-namespace Wikiled.Common.Utilities.Tests.Serialization
+namespace Wikiled.Common.Utilities.Tests.Serialization;
+
+[TestFixture]
+public class JsonStreamingWriterTests
 {
-    [TestFixture]
-    public class JsonStreamingWriterTests
+    private string path;
+
+    private readonly JsonStreamingWriterFactory factory = new JsonStreamingWriterFactory(new RecyclableMemoryStreamManager());
+
+    [SetUp]
+    public void Setup()
     {
-        private string path;
+        path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
+        path.EnsureDirectoryExistence();
+    }
 
-        private readonly JsonStreamingWriterFactory factory = new JsonStreamingWriterFactory(new RecyclableMemoryStreamManager());
-
-        [SetUp]
-        public void Setup()
+    [Test]
+    public void CreateJson()
+    {
+        path = Path.Combine(path, "data.json");
+        using (var writer = factory.CreateJson(path))
         {
-            path = Path.Combine(TestContext.CurrentContext.TestDirectory, "out");
-            path.EnsureDirectoryExistence();
+            writer.WriteObject(new DataInstance { Text = "One" });
+            writer.WriteObject(new DataInstance { Text = "Two" });
         }
 
-        [Test]
-        public void CreateJson()
-        {
-            path = Path.Combine(path, "data.json");
-            using (var writer = factory.CreateJson(path))
-            {
-                writer.WriteObject(new DataInstance { Text = "One" });
-                writer.WriteObject(new DataInstance { Text = "Two" });
-            }
+        var result = JsonConvert.DeserializeObject<DataInstance[]>(File.ReadAllText(path));
+        ClassicAssert.AreEqual(2, result.Length);
+    }
 
-            var result = JsonConvert.DeserializeObject<DataInstance[]>(File.ReadAllText(path));
-            Assert.AreEqual(2, result.Length);
-        }
-
-        [Test]
-        public void CreateCompressedJson()
+    [Test]
+    public void CreateCompressedJson()
+    {
+        path.EnsureDirectoryExistence();
+        path = Path.Combine(path, "data.zip");
+        using (var writer = factory.CreateCompressedJson(path))
         {
-            path.EnsureDirectoryExistence();
-            path = Path.Combine(path, "data.zip");
-            using (var writer = factory.CreateCompressedJson(path))
-            {
-                writer.WriteObject(new DataInstance { Text = "One" });
-                writer.WriteObject(new DataInstance { Text = "Two" });
-            }
+            writer.WriteObject(new DataInstance { Text = "One" });
+            writer.WriteObject(new DataInstance { Text = "Two" });
         }
     }
 }
