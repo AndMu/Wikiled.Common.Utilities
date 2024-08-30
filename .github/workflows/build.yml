@@ -67,4 +67,4 @@ jobs:
     - name: Push NuGet package
       run: |
         cd src/out
-        dotnet nuget push *.nupkg --api-key ${{ process.env.NUGET_API_KEY }} --source ${{ env.NUGET_SOURCE }} --skip-duplicate
+        dotnet nuget push *.nupkg --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.NUGET_SOURCE }} --skip-duplicate
