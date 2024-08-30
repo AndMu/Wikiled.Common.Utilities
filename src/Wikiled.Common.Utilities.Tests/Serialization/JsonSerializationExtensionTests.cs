@@ -6,11 +6,10 @@ using Wikiled.Common.Utilities.Helpers;
 using Wikiled.Common.Utilities.Serialization;
 using Wikiled.Common.Utilities.Tests.Helpers;
 
-namespace Wikiled.Common.Utilities.Tests.Serialization
+namespace Wikiled.Common.Utilities.Tests.Serialization;
+
+[TestFixture]
+public class JsonSerializationExtensionTests
 {
-    [TestFixture]
-    public class JsonSerializationExtensionTests
-    {
        
-    }
 }

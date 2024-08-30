@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Wikiled.Common.Utilities.Config
+namespace Wikiled.Common.Utilities.Config;
+
+public interface IApplicationConfiguration
 {
-    public interface IApplicationConfiguration
-    {
-        DateTime Now { get; }
+    DateTime Now { get; }
 
-        DateTime GetWorkDay(DateTime monitorDate);
+    DateTime GetWorkDay(DateTime monitorDate);
 
-        bool IsWorkDay(DateTime monitorDate);
+    bool IsWorkDay(DateTime monitorDate);
 
-        string GetEnvironmentVariable(string key);
-    }
+    string GetEnvironmentVariable(string key);
 }

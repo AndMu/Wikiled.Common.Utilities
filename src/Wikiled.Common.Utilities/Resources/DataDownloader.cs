@@ -6,75 +6,74 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Wikiled.Common.Utilities.Resources
+namespace Wikiled.Common.Utilities.Resources;
+
+public class DataDownloader : IDataDownloader
 {
-    public class DataDownloader : IDataDownloader
+    private readonly ILogger<DataDownloader> log;
+
+    public DataDownloader(ILogger<DataDownloader> logger)
     {
-        private readonly ILogger<DataDownloader> log;
+        log = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public DataDownloader(ILogger<DataDownloader> logger)
+    public async Task DownloadFile(Uri url, string output, bool always = false)
+    {
+        log.LogInformation("Downloading <{0}> to <{1}>", url, output);
+        if (Directory.Exists(output))
         {
-            log = logger ?? throw new ArgumentNullException(nameof(logger));
+            log.LogInformation("Resources folder <{0} found.", output);
+            if (!always)
+            {
+                return;
+            }
         }
 
-        public async Task DownloadFile(Uri url, string output, bool always = false)
+        WebRequest request = WebRequest.Create(url);
+        using WebResponse response = await request.GetResponseAsync().ConfigureAwait(false);
+        using Stream stream = response.GetResponseStream();
+        UnzipFromStream(stream, output);
+    }
+
+    private void UnzipFromStream(Stream zipStream, string outFolder)
+    {
+        ZipInputStream zipInputStream = new ZipInputStream(zipStream);
+        ZipEntry zipEntry = zipInputStream.GetNextEntry();
+        while (zipEntry != null)
         {
-            log.LogInformation("Downloading <{0}> to <{1}>", url, output);
-            if (Directory.Exists(output))
+            string entryFileName = zipEntry.Name;
+            log.LogInformation("Unpacking [{0}]", entryFileName);
+
+            // to remove the folder from the entry:- entryFileName = Path.GetFileName(entryFileName);
+            // Optionally match entrynames against a selection list here to skip as desired.
+            // The unpacked length is available in the zipEntry.Size property.
+            byte[] buffer = new byte[4096];     // 4K is optimum
+
+            // Manipulate the output filename here as desired.
+            string fullZipToPath = Path.Combine(outFolder, entryFileName);
+            string directoryName = Path.GetDirectoryName(fullZipToPath);
+            if (directoryName.Length > 0)
             {
-                log.LogInformation("Resources folder <{0} found.", output);
-                if (!always)
-                {
-                    return;
-                }
+                Directory.CreateDirectory(directoryName);
             }
 
-            WebRequest request = WebRequest.Create(url);
-            using WebResponse response = await request.GetResponseAsync().ConfigureAwait(false);
-            using Stream stream = response.GetResponseStream();
-            UnzipFromStream(stream, output);
-        }
-
-        private void UnzipFromStream(Stream zipStream, string outFolder)
-        {
-            ZipInputStream zipInputStream = new ZipInputStream(zipStream);
-            ZipEntry zipEntry = zipInputStream.GetNextEntry();
-            while (zipEntry != null)
+            // Skip directory entry
+            string fileName = Path.GetFileName(fullZipToPath);
+            if (fileName.Length == 0)
             {
-                string entryFileName = zipEntry.Name;
-                log.LogInformation("Unpacking [{0}]", entryFileName);
-
-                // to remove the folder from the entry:- entryFileName = Path.GetFileName(entryFileName);
-                // Optionally match entrynames against a selection list here to skip as desired.
-                // The unpacked length is available in the zipEntry.Size property.
-                byte[] buffer = new byte[4096];     // 4K is optimum
-
-                // Manipulate the output filename here as desired.
-                string fullZipToPath = Path.Combine(outFolder, entryFileName);
-                string directoryName = Path.GetDirectoryName(fullZipToPath);
-                if (directoryName.Length > 0)
-                {
-                    Directory.CreateDirectory(directoryName);
-                }
-
-                // Skip directory entry
-                string fileName = Path.GetFileName(fullZipToPath);
-                if (fileName.Length == 0)
-                {
-                    zipEntry = zipInputStream.GetNextEntry();
-                    continue;
-                }
-
-                // Unzip file in buffered chunks. This is just as fast as unpacking to a buffer the full size
-                // of the file, but does not waste memory.
-                // The "using" will close the stream even if an exception occurs.
-                using (FileStream streamWriter = File.Create(fullZipToPath))
-                {
-                    StreamUtils.Copy(zipInputStream, streamWriter, buffer);
-                }
-
                 zipEntry = zipInputStream.GetNextEntry();
+                continue;
             }
+
+            // Unzip file in buffered chunks. This is just as fast as unpacking to a buffer the full size
+            // of the file, but does not waste memory.
+            // The "using" will close the stream even if an exception occurs.
+            using (FileStream streamWriter = File.Create(fullZipToPath))
+            {
+                StreamUtils.Copy(zipInputStream, streamWriter, buffer);
+            }
+
+            zipEntry = zipInputStream.GetNextEntry();
         }
     }
 }

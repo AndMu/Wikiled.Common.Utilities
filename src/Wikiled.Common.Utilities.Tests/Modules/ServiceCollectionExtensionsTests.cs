@@ -6,49 +6,48 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Wikiled.Common.Utilities.Modules;
 
-namespace Wikiled.Common.Utilities.Tests.Modules
+namespace Wikiled.Common.Utilities.Tests.Modules;
+
+[TestFixture]
+public class ServiceCollectionExtensionsTests
 {
-    [TestFixture]
-    public class ServiceCollectionExtensionsTests
+    private ServiceCollection collection;
+    [SetUp]
+    public void SetUp()
     {
-        private ServiceCollection collection;
-        [SetUp]
-        public void SetUp()
-        {
-            collection = new ServiceCollection();
-        }
+        collection = new ServiceCollection();
+    }
 
-        [Test]
-        public async Task AsyncFactory()
-        {
-            collection.AddAsyncFactory(collection => Task.FromResult("Test"));
-            var provider = collection.BuildServiceProvider();
-            var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
-            ClassicAssert.AreEqual("Test", result);
-        }
+    [Test]
+    public async Task AsyncFactory()
+    {
+        collection.AddAsyncFactory(collection => Task.FromResult("Test"));
+        var provider = collection.BuildServiceProvider();
+        var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
+        ClassicAssert.AreEqual("Test", result);
+    }
 
-        [Test]
-        public async Task AsyncFactory2()
-        {
-            collection.AddSingleton("Test");
-            collection.AddAsyncFactory<string>((collection, text) => Task.CompletedTask);
-            var provider = collection.BuildServiceProvider();
-            var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
-            ClassicAssert.AreEqual("Test", result);
-        }
+    [Test]
+    public async Task AsyncFactory2()
+    {
+        collection.AddSingleton("Test");
+        collection.AddAsyncFactory<string>((collection, text) => Task.CompletedTask);
+        var provider = collection.BuildServiceProvider();
+        var result = await provider.GetService<IAsyncServiceFactory<string>>().GetService();
+        ClassicAssert.AreEqual("Test", result);
+    }
 
-        [Test]
-        public async Task AsyncFactoryRefresh()
-        {
-            var total = 0;
-            collection.AddAsyncFactory(collection => Task.FromResult((object)total++));
-            var provider = collection.BuildServiceProvider();
-            var result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
-            ClassicAssert.AreEqual(0, result);
-            result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
-            ClassicAssert.AreEqual(0, result);
-            result = await provider.GetService<IAsyncServiceFactory<object>>().GetService(true);
-            ClassicAssert.AreEqual(1, result);
-        }
+    [Test]
+    public async Task AsyncFactoryRefresh()
+    {
+        var total = 0;
+        collection.AddAsyncFactory(collection => Task.FromResult((object)total++));
+        var provider = collection.BuildServiceProvider();
+        var result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
+        ClassicAssert.AreEqual(0, result);
+        result = await provider.GetService<IAsyncServiceFactory<object>>().GetService();
+        ClassicAssert.AreEqual(0, result);
+        result = await provider.GetService<IAsyncServiceFactory<object>>().GetService(true);
+        ClassicAssert.AreEqual(1, result);
     }
 }

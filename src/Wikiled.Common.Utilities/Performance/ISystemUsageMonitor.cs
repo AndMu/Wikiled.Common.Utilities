@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Wikiled.Common.Utilities.Performance
+namespace Wikiled.Common.Utilities.Performance;
+
+public interface ISystemUsageMonitor : IDisposable
 {
-    public interface ISystemUsageMonitor : IDisposable
-    {
-        ISystemUsageCollector Collector { get; }
+    ISystemUsageCollector Collector { get; }
 
-        ISystemUsageBucket UsageBucket { get; }
+    ISystemUsageBucket UsageBucket { get; }
 
-        event EventHandler Refreshed;
+    event EventHandler Refreshed;
 
-        void Start(TimeSpan refresh, TimeSpan maxPeriod);
-    }
+    void Start(TimeSpan refresh, TimeSpan maxPeriod);
 }

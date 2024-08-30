@@ -1,7 +1,6 @@
-﻿namespace Wikiled.Common.Utilities.Modules
+﻿namespace Wikiled.Common.Utilities.Modules;
+
+public interface IServiceFactory<out T>
 {
-    public interface IServiceFactory<out T>
-    {
-        T GetService();
-    }
+    T GetService();
 }

@@ -1,7 +1,6 @@
-﻿namespace Wikiled.Common.Utilities.Tests.Auth
+﻿namespace Wikiled.Common.Utilities.Tests.Auth;
+
+public class TestToken
 {
-    public class TestToken
-    {
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }

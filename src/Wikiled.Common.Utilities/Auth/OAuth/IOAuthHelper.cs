@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 
-namespace Wikiled.Common.Utilities.Auth.OAuth
+namespace Wikiled.Common.Utilities.Auth.OAuth;
+
+public interface IOAuthHelper
 {
-    public interface IOAuthHelper
-    {
-        string RedirectUri { get; set; }
+    string RedirectUri { get; set; }
 
-        string Code { get; }
+    string Code { get; }
 
-        bool IsSuccessful { get; }
+    bool IsSuccessful { get; }
 
-        Task Start(string serviceUrl);
-    }
+    Task Start(string serviceUrl);
 }

@@ -3,82 +3,81 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Wikiled.Common.Testing.Utilities.Reflection
+namespace Wikiled.Common.Testing.Utilities.Reflection;
+
+public static class ConstructorHelper
 {
-    public static class ConstructorHelper
+    public static void ConstructorMustThrowArgumentNullException<T>(TypeSubstitute? substitute = null)
     {
-        public static void ConstructorMustThrowArgumentNullException<T>(TypeSubstitute? substitute = null)
-        {
-            ConstructorMustThrowArgumentNullException(typeof(T), substitute);
-        }
+        ConstructorMustThrowArgumentNullException(typeof(T), substitute);
+    }
 
-        public static void ConstructorMustThrowArgumentNullException(Type type, TypeSubstitute? substitute = null)
+    public static void ConstructorMustThrowArgumentNullException(Type type, TypeSubstitute? substitute = null)
+    {
+        foreach (var constructor in type.GetConstructors())
         {
-            foreach (var constructor in type.GetConstructors())
+            var parameters = constructor.GetParameters();
+
+            var arguments = parameters.Select(
+                    p =>
+                    {
+                        var value = substitute?.Construct(p.ParameterType);
+                        if (value != null)
+                        {
+                            return value;
+                        }
+
+                        if (p.ParameterType.IsEnum)
+                        {
+                            return p.ParameterType.GetEnumValues().GetValue(0);
+                        }
+
+                        if (p.ParameterType.IsValueType)
+                        {
+                            return Activator.CreateInstance(p.ParameterType);
+                        }
+
+                        if (p.ParameterType == typeof(string))
+                        {
+                            return "Test";
+                        }
+
+                        var mockType = typeof(Mock<>).MakeGenericType(p.ParameterType);
+                        return ((Mock)Activator.CreateInstance(mockType)).Object;
+                    })
+                .ToArray();
+
+            for (var i = 0; i < parameters.Length; i++)
             {
-                var parameters = constructor.GetParameters();
+                var mocksCopy = arguments.ToArray();
 
-                var arguments = parameters.Select(
-                                              p =>
-                                              {
-                                                  var value = substitute?.Construct(p.ParameterType);
-                                                  if (value != null)
-                                                  {
-                                                      return value;
-                                                  }
+                var argType = mocksCopy[i].GetType();
 
-                                                  if (p.ParameterType.IsEnum)
-                                                  {
-                                                      return p.ParameterType.GetEnumValues().GetValue(0);
-                                                  }
-
-                                                  if (p.ParameterType.IsValueType)
-                                                  {
-                                                      return Activator.CreateInstance(p.ParameterType);
-                                                  }
-
-                                                  if (p.ParameterType == typeof(string))
-                                                  {
-                                                      return "Test";
-                                                  }
-
-                                                  var mockType = typeof(Mock<>).MakeGenericType(p.ParameterType);
-                                                  return ((Mock)Activator.CreateInstance(mockType)).Object;
-                                              })
-                                          .ToArray();
-
-                for (var i = 0; i < parameters.Length; i++)
+                if (substitute?.ChechNotNull(argType, i) == true)
                 {
-                    var mocksCopy = arguments.ToArray();
+                    continue;
+                }
 
-                    var argType = mocksCopy[i].GetType();
-
-                    if (substitute?.ChechNotNull(argType, i) == true)
+                if (argType.IsValueType)
+                {
+                    if (Nullable.GetUnderlyingType(argType) == null)
                     {
                         continue;
                     }
+                }
 
-                    if (argType.IsValueType)
+                mocksCopy[i] = null;
+                try
+                {
+                    constructor.Invoke(mocksCopy);
+                    throw new Exception($"ArgumentNullException expected for parameter {parameters[i].Name} of constructor, but no exception was thrown");
+                }
+                catch (TargetInvocationException ex)
+                {
+                    if (ex.InnerException?.GetType() != typeof(ArgumentNullException))
                     {
-                        if (Nullable.GetUnderlyingType(argType) == null)
-                        {
-                            continue;
-                        }
-                    }
-
-                    mocksCopy[i] = null;
-                    try
-                    {
-                        constructor.Invoke(mocksCopy);
-                        throw new Exception($"ArgumentNullException expected for parameter {parameters[i].Name} of constructor, but no exception was thrown");
-                    }
-                    catch (TargetInvocationException ex)
-                    {
-                        if (ex.InnerException?.GetType() != typeof(ArgumentNullException))
-                        {
-                            throw new Exception(
-                                $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
-                        }
+                        throw new Exception(
+                            $"ArgumentNullException expected for parameter {parameters[i].Name} of  constructor, but exception of type {ex.InnerException.GetType()} was thrown");
                     }
                 }
             }

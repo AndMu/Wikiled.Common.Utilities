@@ -6,95 +6,94 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Wikiled.Common.Utilities.Helpers;
 
-namespace Wikiled.Common.Utilities.Auth.OAuth
+namespace Wikiled.Common.Utilities.Auth.OAuth;
+
+public class OAuthHelper : IOAuthHelper
 {
-    public class OAuthHelper : IOAuthHelper
+    private readonly ILogger<OAuthHelper> logger;
+
+    private string redirectUri;
+
+    public OAuthHelper(ILogger<OAuthHelper> logger, OAuthConfig config)
     {
-        private readonly ILogger<OAuthHelper> logger;
+        if (config == null) throw new ArgumentNullException(nameof(config));
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        RedirectUri = $"http://{IPAddress.Loopback}:{config.Port ?? GetRandomUnusedPort()}/{config.Path}";
+        logger.LogInformation("redirect URI: " + RedirectUri);
+    }
 
-        private string redirectUri;
-
-        public OAuthHelper(ILogger<OAuthHelper> logger, OAuthConfig config)
+    public string RedirectUri
+    {
+        get => redirectUri;
+        set
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            RedirectUri = $"http://{IPAddress.Loopback}:{config.Port ?? GetRandomUnusedPort()}/{config.Path}";
-            logger.LogInformation("redirect URI: " + RedirectUri);
-        }
-
-        public string RedirectUri
-        {
-            get => redirectUri;
-            set
+            if (redirectUri != value)
             {
-                if (redirectUri != value)
+                logger.LogInformation("Changing redirect URI: " + RedirectUri);
+                redirectUri = value;
+            }
+        }
+    }
+
+    public string Code { get; private set; }
+
+    public bool IsSuccessful { get; private set; }
+
+    public async Task Start(string serviceUrl)
+    {
+        IsSuccessful = false;
+        var http = new HttpListener();
+        http.Prefixes.Add(RedirectUri);
+        logger.LogInformation("Listening...");
+        http.Start();
+
+        // Opens request in the browser.
+        ExternaApp.OpenUrl(serviceUrl);
+
+        // Waits for the OAuth authorization response.
+        HttpListenerContext context = await http.GetContextAsync().ConfigureAwait(false);
+
+        // Sends an HTTP response to the browser.
+        HttpListenerResponse response = context.Response;
+        var responseString = "<html><head><meta http-equiv='refresh' content='10;url=https://google.com'></head><body>Please return to the app.</body></html>";
+        var buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+        response.ContentLength64 = buffer.Length;
+        Stream responseOutput = response.OutputStream;
+        Task responseTask = responseOutput.WriteAsync(buffer, 0, buffer.Length)
+            .ContinueWith(
+                task =>
                 {
-                    logger.LogInformation("Changing redirect URI: " + RedirectUri);
-                    redirectUri = value;
-                }
-            }
-        }
+                    responseOutput.Close();
+                    http.Stop();
+                    logger.LogInformation("HTTP server stopped.");
+                });
 
-        public string Code { get; private set; }
-
-        public bool IsSuccessful { get; private set; }
-
-        public async Task Start(string serviceUrl)
+        // Checks for errors.
+        if (context.Request.QueryString.Get("error") != null)
         {
-            IsSuccessful = false;
-            var http = new HttpListener();
-            http.Prefixes.Add(RedirectUri);
-            logger.LogInformation("Listening...");
-            http.Start();
-
-            // Opens request in the browser.
-            ExternaApp.OpenUrl(serviceUrl);
-
-            // Waits for the OAuth authorization response.
-            HttpListenerContext context = await http.GetContextAsync().ConfigureAwait(false);
-
-            // Sends an HTTP response to the browser.
-            HttpListenerResponse response = context.Response;
-            var responseString = "<html><head><meta http-equiv='refresh' content='10;url=https://google.com'></head><body>Please return to the app.</body></html>";
-            var buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-            response.ContentLength64 = buffer.Length;
-            Stream responseOutput = response.OutputStream;
-            Task responseTask = responseOutput.WriteAsync(buffer, 0, buffer.Length)
-                                              .ContinueWith(
-                                                  task =>
-                                                  {
-                                                      responseOutput.Close();
-                                                      http.Stop();
-                                                      logger.LogInformation("HTTP server stopped.");
-                                                  });
-
-            // Checks for errors.
-            if (context.Request.QueryString.Get("error") != null)
-            {
-                logger.LogInformation(($"OAuth authorization error: {context.Request.QueryString.Get("error")}"));
-                return;
-            }
-
-            if (context.Request.QueryString.Get("code") == null)
-            {
-                logger.LogInformation("Malformed authorization response. " + context.Request.QueryString);
-                return;
-            }
-
-            // extracts the code
-            var code = context.Request.QueryString.Get("code");
-            logger.LogInformation("Authorization code: " + code);
-            Code = code;
-            IsSuccessful = true;
+            logger.LogInformation(($"OAuth authorization error: {context.Request.QueryString.Get("error")}"));
+            return;
         }
 
-        private static int GetRandomUnusedPort()
+        if (context.Request.QueryString.Get("code") == null)
         {
-            var listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-            listener.Stop();
-            return port;
+            logger.LogInformation("Malformed authorization response. " + context.Request.QueryString);
+            return;
         }
+
+        // extracts the code
+        var code = context.Request.QueryString.Get("code");
+        logger.LogInformation("Authorization code: " + code);
+        Code = code;
+        IsSuccessful = true;
+    }
+
+    private static int GetRandomUnusedPort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 }

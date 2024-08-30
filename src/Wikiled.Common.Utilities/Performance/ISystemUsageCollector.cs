@@ -1,7 +1,6 @@
-﻿namespace Wikiled.Common.Utilities.Performance
+﻿namespace Wikiled.Common.Utilities.Performance;
+
+public interface ISystemUsageCollector : ISystemUsage
 {
-    public interface ISystemUsageCollector : ISystemUsage
-    {
-        void Refresh();
-    }
+    void Refresh();
 }
