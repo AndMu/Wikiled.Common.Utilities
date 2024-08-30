@@ -6,7 +6,7 @@ namespace Wikiled.Common.Utilities.Auth.OAuth;
 
 public static class OAuthModule
 {
-    public static IServiceCollection AddOAuth(IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddOAuth(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IOAuthHelper, OAuthHelper>();
         services.AddTransient(typeof(IAuthentication<>), typeof(OAuthAuthentication<>));

@@ -11,7 +11,7 @@ namespace Wikiled.Common.Utilities.Modules;
 
 public static class CommonModule
 {
-    public static IServiceCollection AddCommonServices(IServiceCollection service)
+    public static IServiceCollection AddCommonServices(this IServiceCollection service)
     {
         service.AddSingleton<IScheduler>(TaskPoolScheduler.Default);
         service.AddSingleton<RecyclableMemoryStreamManager>();
