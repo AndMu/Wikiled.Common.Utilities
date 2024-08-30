@@ -58,7 +58,6 @@ jobs:
       with:
         name: test-results
         path: TestResults/        
-
     
     - name: Pack NuGet package
       run: |        
