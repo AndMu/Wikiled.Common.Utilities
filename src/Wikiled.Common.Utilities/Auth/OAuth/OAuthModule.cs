@@ -1,23 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using Wikiled.Common.Utilities.Modules;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Wikiled.Common.Utilities.Config;
 
 namespace Wikiled.Common.Utilities.Auth.OAuth;
 
-public class OAuthModule : IModule
+public static class OAuthModule
 {
-    private readonly OAuthConfig config;
-
-    public OAuthModule(OAuthConfig config)
+    public static IServiceCollection AddOAuth(IServiceCollection services, IConfiguration configuration)
     {
-        this.config = config ?? throw new ArgumentNullException(nameof(config));
-    }
-
-    public IServiceCollection ConfigureCommonServices(IServiceCollection services)
-    {
-        services.AddSingleton(config);
         services.AddTransient<IOAuthHelper, OAuthHelper>();
         services.AddTransient(typeof(IAuthentication<>), typeof(OAuthAuthentication<>));
+        configuration.ExtractConfig<OAuthConfig>("OAuth", services);
         return services;
     }
 }
